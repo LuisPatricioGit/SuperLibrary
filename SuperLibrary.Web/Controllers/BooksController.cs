@@ -1,5 +1,4 @@
-﻿using System.Linq;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using SuperLibrary.Web.Data;
@@ -9,29 +8,28 @@ namespace SuperLibrary.Web.Controllers
 {
     public class BooksController : Controller
     {
-        private readonly DataContext _context;
+        private readonly IRepository _repository;
 
-        public BooksController(DataContext context)
+        public BooksController(IRepository repository)
         {
-            _context = context;
+            _repository = repository;
         }
 
         // GET: Books
-        public async Task<IActionResult> Index()
+        public IActionResult Index()
         {
-            return View(await _context.Books.ToListAsync());
+            return View(_repository.GetBooks());
         }
 
         // GET: Books/Details/5
-        public async Task<IActionResult> Details(int? id)
+        public IActionResult Details(int? id)
         {
             if (id == null)
             {
                 return NotFound();
             }
 
-            var book = await _context.Books
-                .FirstOrDefaultAsync(m => m.Id == id);
+            var book = _repository.GetBook(id.Value);
             if (book == null)
             {
                 return NotFound();
@@ -55,22 +53,22 @@ namespace SuperLibrary.Web.Controllers
         {
             if (ModelState.IsValid)
             {
-                _context.Add(book);
-                await _context.SaveChangesAsync();
+                _repository.AddBook(book);
+                await _repository.SaveAllAsync();
                 return RedirectToAction(nameof(Index));
             }
             return View(book);
         }
 
         // GET: Books/Edit/5
-        public async Task<IActionResult> Edit(int? id)
+        public IActionResult Edit(int? id)
         {
             if (id == null)
             {
                 return NotFound();
             }
 
-            var book = await _context.Books.FindAsync(id);
+            var book = _repository.GetBook(id.Value);
             if (book == null)
             {
                 return NotFound();
@@ -94,12 +92,12 @@ namespace SuperLibrary.Web.Controllers
             {
                 try
                 {
-                    _context.Update(book);
-                    await _context.SaveChangesAsync();
+                    _repository.UpdateBook(book);
+                    await _repository.SaveAllAsync();
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!BookExists(book.Id))
+                    if (!_repository.BookExists(book.Id))
                     {
                         return NotFound();
                     }
@@ -114,15 +112,14 @@ namespace SuperLibrary.Web.Controllers
         }
 
         // GET: Books/Delete/5
-        public async Task<IActionResult> Delete(int? id)
+        public IActionResult Delete(int? id)
         {
             if (id == null)
             {
                 return NotFound();
             }
 
-            var book = await _context.Books
-                .FirstOrDefaultAsync(m => m.Id == id);
+            var book = _repository.GetBook(id.Value);
             if (book == null)
             {
                 return NotFound();
@@ -136,15 +133,10 @@ namespace SuperLibrary.Web.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var book = await _context.Books.FindAsync(id);
-            _context.Books.Remove(book);
-            await _context.SaveChangesAsync();
+            var book = _repository.GetBook(id);
+            _repository.RemoveBook(book);
+            await _repository.SaveAllAsync();
             return RedirectToAction(nameof(Index));
-        }
-
-        private bool BookExists(int id)
-        {
-            return _context.Books.Any(e => e.Id == id);
         }
     }
 }

@@ -26,6 +26,7 @@ namespace SuperLibrary.Web.Data
                 AddBook("Gerónimo Stilton: O Mistério do Olho de Esmeralda","Gerónimo Stilton","Editorial Presença");
                 AddBook("Cherub: O Recruta","Robert Muchamore","Porto Editora");
                 AddBook("Astérix na Lusitânia","René Gosciny","Edições Asa");
+                //AddBook("Sonic The Hedgehog #1: Fallout", "Ian Flynn", "IDW Publishing");
             }
 
             await _context.SaveChangesAsync();
