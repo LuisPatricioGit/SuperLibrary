@@ -1,4 +1,8 @@
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using SuperLibrary.Web.Data;
@@ -7,28 +11,57 @@ namespace SuperLibrary.Web
 {
     public class Program
     {
-        public static void Main(string[] args)
+        public static async Task Main(string[] args)
         {
-            var host = CreateHostBuilder(args).Build();
-            RunSeeding(host);
-            host.Run();
-        }
+            var builder = WebApplication.CreateBuilder(args);
 
-        private static void RunSeeding(IHost host)
-        {
-            var scopeFactory = host.Services.GetService<IServiceScopeFactory>();
-            using(var scope = scopeFactory.CreateScope())
+            // Add services to the container.
+            builder.Services.AddControllersWithViews();
+
+            // Services
+            builder.Services.AddDbContext<DataContext>(o =>
             {
-                var seeder = scope.ServiceProvider.GetService<SeedDb>();
-                seeder.SeedAsync().Wait();
-            }
-        }
+                // TODO: Change "LocalConnection" to "OnlineConnection"
+                o.UseSqlServer(builder.Configuration.GetConnectionString("LocalConnection"));
+            });
 
-        public static IHostBuilder CreateHostBuilder(string[] args) =>
-            Host.CreateDefaultBuilder(args)
-                .ConfigureWebHostDefaults(webBuilder =>
-                {
-                    webBuilder.UseStartup<Startup>();
-                });
+            // Seeder
+            builder.Services.AddTransient<SeedDb>();
+
+            // Repositories
+            builder.Services.AddScoped<IBookRepository, BookRepository>();
+
+            builder.Services.AddControllersWithViews();
+
+            var app = builder.Build();
+
+            // Run Seeder
+            using (var scope = app.Services.CreateScope())
+            {
+                var seeder = scope.ServiceProvider.GetRequiredService<SeedDb>();
+                await seeder.SeedAsync();
+            }
+
+            // Configure the HTTP request pipeline.
+            if (!app.Environment.IsDevelopment())
+            {
+                app.UseExceptionHandler("/Home/Error");
+                // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
+                app.UseHsts();
+            }
+
+            app.UseHttpsRedirection();
+            app.UseStaticFiles();
+
+            app.UseRouting();
+
+            app.UseAuthorization();
+
+            app.MapControllerRoute(
+                name: "default",
+                pattern: "{controller=Home}/{action=Index}/{id?}");
+
+            app.Run();
+        }
     }
 }

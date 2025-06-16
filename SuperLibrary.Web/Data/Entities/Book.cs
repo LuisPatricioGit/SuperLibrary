@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace SuperLibrary.Web.Data.Entities
 {
-    public class Book
+    public class Book : IEntity
     {
         public int Id { get; set; }
 
@@ -34,5 +34,6 @@ namespace SuperLibrary.Web.Data.Entities
 
         [Display(Name = "Is Available")]
         public bool IsAvailable { get; set; }
+        public bool WasDeleted { get; set; }
     }
 }

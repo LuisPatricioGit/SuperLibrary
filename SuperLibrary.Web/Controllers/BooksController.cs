@@ -8,28 +8,28 @@ namespace SuperLibrary.Web.Controllers
 {
     public class BooksController : Controller
     {
-        private readonly IRepository _repository;
+        private readonly IBookRepository _bookRepository;
 
-        public BooksController(IRepository repository)
+        public BooksController(IBookRepository bookRepository)
         {
-            _repository = repository;
+            _bookRepository = bookRepository;
         }
 
         // GET: Books
         public IActionResult Index()
         {
-            return View(_repository.GetBooks());
+            return View(_bookRepository.GetAll());
         }
 
         // GET: Books/Details/5
-        public IActionResult Details(int? id)
+        public async Task<IActionResult> Details(int? id)
         {
             if (id == null)
             {
                 return NotFound();
             }
 
-            var book = _repository.GetBook(id.Value);
+            var book = await _bookRepository.GetByIdAsync(id.Value);
             if (book == null)
             {
                 return NotFound();
@@ -53,22 +53,21 @@ namespace SuperLibrary.Web.Controllers
         {
             if (ModelState.IsValid)
             {
-                _repository.AddBook(book);
-                await _repository.SaveAllAsync();
+                await _bookRepository.CreateAsync(book);
                 return RedirectToAction(nameof(Index));
             }
             return View(book);
         }
 
         // GET: Books/Edit/5
-        public IActionResult Edit(int? id)
+        public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
             {
                 return NotFound();
             }
 
-            var book = _repository.GetBook(id.Value);
+            var book = await _bookRepository.GetByIdAsync(id.Value);
             if (book == null)
             {
                 return NotFound();
@@ -92,12 +91,11 @@ namespace SuperLibrary.Web.Controllers
             {
                 try
                 {
-                    _repository.UpdateBook(book);
-                    await _repository.SaveAllAsync();
+                    await _bookRepository.UpdateAsync(book);
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!_repository.BookExists(book.Id))
+                    if (!await _bookRepository.ExistAsync(book.Id))
                     {
                         return NotFound();
                     }
@@ -112,14 +110,14 @@ namespace SuperLibrary.Web.Controllers
         }
 
         // GET: Books/Delete/5
-        public IActionResult Delete(int? id)
+        public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
             {
                 return NotFound();
             }
 
-            var book = _repository.GetBook(id.Value);
+            var book = await _bookRepository.GetByIdAsync(id.Value);
             if (book == null)
             {
                 return NotFound();
@@ -133,9 +131,8 @@ namespace SuperLibrary.Web.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var book = _repository.GetBook(id);
-            _repository.RemoveBook(book);
-            await _repository.SaveAllAsync();
+            var book = await _bookRepository.GetByIdAsync(id);
+            await _bookRepository.DeleteAsync(book);
             return RedirectToAction(nameof(Index));
         }
     }
