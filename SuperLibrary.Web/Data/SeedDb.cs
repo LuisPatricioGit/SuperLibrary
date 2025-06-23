@@ -1,49 +1,72 @@
 ﻿using System;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Identity;
 using SuperLibrary.Web.Data.Entities;
+using SuperLibrary.Web.Helper;
 
-namespace SuperLibrary.Web.Data
+namespace SuperLibrary.Web.Data;
+
+public class SeedDb
 {
-    public class SeedDb
+    private readonly DataContext _context;
+    private readonly IUserHelper _userHelper;
+    private Random _random;
+
+    public SeedDb(DataContext context, IUserHelper userHelper)
     {
-        private readonly DataContext _context;
-        private Random _random;
+        _context = context;
+        _userHelper = userHelper;
+        _random = new Random();
+    }
 
-        public SeedDb(DataContext context)
+    public async Task SeedAsync()
+    {
+        await _context.Database.EnsureCreatedAsync();
+
+        var user = await _userHelper.GetUserByEmailAsync("SuperLibrary.Admin@gmail.com");
+        if (user == null)
         {
-            _context = context;
-            _random = new Random();
-        }
-
-        public async Task SeedAsync()
-        {
-            await _context.Database.EnsureCreatedAsync();
-
-            if (!_context.Books.Any())
+            user = new User
             {
-                AddBook("DragonBall: Son Goku e os Seus Amigos","Akira Toriyama","Devir");
-                AddBook("Gerónimo Stilton: O Mistério do Olho de Esmeralda","Gerónimo Stilton","Editorial Presença");
-                AddBook("Cherub: O Recruta","Robert Muchamore","Porto Editora");
-                AddBook("Astérix na Lusitânia","René Gosciny","Edições Asa");
-                //AddBook("Sonic The Hedgehog #1: Fallout", "Ian Flynn", "IDW Publishing");
+                FirstName = "Admin",
+                LastName = "SuperLibrary",
+                Email = "SuperLibrary.Admin@gmail.com",
+                UserName = "SLAdmin",
+                PhoneNumber = "123456789",
+            };
+
+            var result = await _userHelper.AddUserAsync(user, "123456");
+            
+            if (result != IdentityResult.Success)
+            {
+                throw new InvalidOperationException("Could not Create the User in Seeder");
             }
-
-            await _context.SaveChangesAsync();
         }
 
-        private void AddBook(string title, string author, string publisher)
+        if (!_context.Books.Any())
         {
-            _context.Books.Add(new Book
-            {
-                Title = title,
-                Author = author,
-                Publisher = publisher,
-                Copies = _random.Next(1000),
-                GenreId = _random.Next(3),
-                IsAvailable = true
-
-            });
+            AddBook("DragonBall: Son Goku e os Seus Amigos", "Akira Toriyama", "Devir", user);
+            AddBook("Gerónimo Stilton: O Mistério do Olho de Esmeralda", "Gerónimo Stilton", "Editorial Presença", user);
+            AddBook("Cherub: O Recruta", "Robert Muchamore", "Porto Editora", user);
+            AddBook("Astérix na Lusitânia", "René Gosciny", "Edições Asa", user);
+            //AddBook("Sonic The Hedgehog #1: Fallout", "Ian Flynn", "IDW Publishing", user);
         }
+
+        await _context.SaveChangesAsync();
+    }
+
+    private void AddBook(string title, string author, string publisher, User user)
+    {
+        _context.Books.Add(new Book
+        {
+            Title = title,
+            Author = author,
+            Publisher = publisher,
+            Copies = _random.Next(1000),
+            GenreId = _random.Next(3),
+            IsAvailable = true,
+            User = user
+        });
     }
 }

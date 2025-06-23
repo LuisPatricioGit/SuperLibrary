@@ -1,9 +1,8 @@
-﻿namespace SuperLibrary.Web.Data.Entities
-{
-    public interface IEntity
-    {
-        int Id { get; set; }
+﻿namespace SuperLibrary.Web.Data.Entities;
 
-        bool WasDeleted { get; set; }
-    }
+public interface IEntity
+{
+    int Id { get; set; }
+
+    bool WasDeleted { get; set; }
 }
