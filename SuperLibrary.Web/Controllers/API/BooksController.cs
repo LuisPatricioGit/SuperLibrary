@@ -17,6 +17,6 @@ public class BooksController : Controller
     [HttpGet]
     public IActionResult GetBooks()
     {
-        return Ok(_bookRepository.GetAll());
+        return Ok(_bookRepository.GetAllWithUsers());
     }
 }
