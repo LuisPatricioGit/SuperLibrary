@@ -15,11 +15,19 @@ public class BooksController : Controller
 {
     private readonly IBookRepository _bookRepository;
     private readonly IUserHelper _userHelper;
+    private readonly IImageHelper _imageHelper;
+    private readonly IConverterHelper _converterHelper;
 
-    public BooksController(IBookRepository bookRepository, IUserHelper userHelper)
+    public BooksController(
+        IBookRepository bookRepository, 
+        IUserHelper userHelper, 
+        IImageHelper imageHelper, 
+        IConverterHelper converterHelper)
     {
         _bookRepository = bookRepository;
         _userHelper = userHelper;
+        _imageHelper = imageHelper;
+        _converterHelper = converterHelper;
     }
 
     // GET: Books
@@ -64,22 +72,10 @@ public class BooksController : Controller
 
             if (model.ImageFile != null && model.ImageFile.Length > 0)
             {
-                var guid = Guid.NewGuid().ToString();
-                var file = $"{guid}.jpg";
-
-                path = Path.Combine(Directory.GetCurrentDirectory(), 
-                                    "wwwroot\\images\\books", 
-                                    file);
-
-                using (var stream = new FileStream(path, FileMode.Create))
-                {
-                    await model.ImageFile.CopyToAsync(stream);
-                }
-
-                path = $"~/images/books/{file}";
+                path = await _imageHelper.UploadImageAsync(model.ImageFile, "books");
             }
 
-            var book = this.ToBook(model, path);
+            var book = _converterHelper.ToBook(model, path, true);
 
             // TODO: Change User to Logged In
             book.User = await _userHelper.GetUserByEmailAsync("SuperLibrary.Admin@gmail.com");
@@ -87,24 +83,6 @@ public class BooksController : Controller
             return RedirectToAction(nameof(Index));
         }
         return View(model);
-    }
-
-    private Book ToBook(BookViewModel model, string path)
-    {
-        return new Book
-        {
-            Id = model.Id,
-            ImageUrl = path,
-            Title = model.Title,
-            Author = model.Author,
-            Publisher = model.Publisher,
-            ReleaseYear = model.ReleaseYear,
-            Copies = model.Copies,
-            GenreId = model.GenreId,
-            IsAvailable = model.IsAvailable,
-            WasDeleted = model.WasDeleted,
-            User = model.User,
-        };
     }
 
     // GET: Books/Edit/5
@@ -121,26 +99,8 @@ public class BooksController : Controller
             return NotFound();
         }
 
-        var model = this.ToBookViewModel(book);
+        var model = _converterHelper.ToBookViewModel(book);
         return View(model);
-    }
-
-    private BookViewModel ToBookViewModel(Book book)
-    {
-        return new BookViewModel
-        {
-            Id = book.Id,
-            ImageUrl = book.ImageUrl,
-            Title = book.Title,
-            Author = book.Author,
-            Publisher = book.Publisher,
-            ReleaseYear = book.ReleaseYear,
-            Copies = book.Copies,
-            GenreId = book.GenreId,
-            IsAvailable = book.IsAvailable,
-            WasDeleted = book.WasDeleted,
-            User = book.User,
-        };
     }
 
     // POST: Books/Edit/5
@@ -158,22 +118,10 @@ public class BooksController : Controller
 
                 if (model.ImageFile != null && model.ImageFile.Length > 0)
                 {
-                    var guid = Guid.NewGuid().ToString();
-                    var file = $"{guid}.jpg";
-
-                    path = Path.Combine(Directory.GetCurrentDirectory(),
-                                        "wwwroot\\images\\books",
-                                        file);
-
-                    using (var stream = new FileStream(path, FileMode.Create))
-                    {
-                        await model.ImageFile.CopyToAsync(stream);
-                    }
-
-                    path = $"~/images/books/{file}";
+                    path = await _imageHelper.UploadImageAsync(model.ImageFile, "books");
                 }
 
-                var book = this.ToBook(model, path);
+                var book = _converterHelper.ToBook(model, path, false);
 
                 // TODO: Change User to Logged In
                 book.User = await _userHelper.GetUserByEmailAsync("SuperLibrary.Admin@gmail.com");
