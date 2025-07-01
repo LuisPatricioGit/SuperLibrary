@@ -1,11 +1,9 @@
 ﻿using System;
-using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using SuperLibrary.Web.Data;
-using SuperLibrary.Web.Data.Entities;
 using SuperLibrary.Web.Helper;
 using SuperLibrary.Web.Models;
 
@@ -15,18 +13,18 @@ public class BooksController : Controller
 {
     private readonly IBookRepository _bookRepository;
     private readonly IUserHelper _userHelper;
-    private readonly IImageHelper _imageHelper;
+    private readonly IBlobHelper _blobHelper;
     private readonly IConverterHelper _converterHelper;
 
     public BooksController(
-        IBookRepository bookRepository, 
-        IUserHelper userHelper, 
-        IImageHelper imageHelper, 
+        IBookRepository bookRepository,
+        IUserHelper userHelper,
+        IBlobHelper blobHelper,
         IConverterHelper converterHelper)
     {
         _bookRepository = bookRepository;
         _userHelper = userHelper;
-        _imageHelper = imageHelper;
+        _blobHelper = blobHelper;
         _converterHelper = converterHelper;
     }
 
@@ -68,14 +66,14 @@ public class BooksController : Controller
     {
         if (ModelState.IsValid)
         {
-            var path = string.Empty;
+            Guid imageId = Guid.Empty;
 
             if (model.ImageFile != null && model.ImageFile.Length > 0)
             {
-                path = await _imageHelper.UploadImageAsync(model.ImageFile, "books");
+                imageId = await _blobHelper.UploadBlobAsync(model.ImageFile, "books");
             }
 
-            var book = _converterHelper.ToBook(model, path, true);
+            var book = _converterHelper.ToBook(model, imageId, true);
 
             // TODO: Change User to Logged In
             book.User = await _userHelper.GetUserByEmailAsync("SuperLibrary.Admin@gmail.com");
@@ -114,14 +112,14 @@ public class BooksController : Controller
         {
             try
             {
-                var path = model.ImageUrl;
+                Guid imageId = model.ImageId;
 
                 if (model.ImageFile != null && model.ImageFile.Length > 0)
                 {
-                    path = await _imageHelper.UploadImageAsync(model.ImageFile, "books");
+                    imageId = await _blobHelper.UploadBlobAsync(model.ImageFile, "books");
                 }
 
-                var book = _converterHelper.ToBook(model, path, false);
+                var book = _converterHelper.ToBook(model, imageId, false);
 
                 // TODO: Change User to Logged In
                 book.User = await _userHelper.GetUserByEmailAsync("SuperLibrary.Admin@gmail.com");

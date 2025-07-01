@@ -30,7 +30,7 @@ public class Book : IEntity
     public int GenreId { get; set; }
 
     [Display(Name = "Image")]
-    public string ImageUrl { get; set; }
+    public Guid ImageId { get; set; }
 
     [Display(Name = "Is Available")]
     public bool IsAvailable { get; set; }
@@ -39,16 +39,9 @@ public class Book : IEntity
 
     public User User { get; set; }
 
-    public string ImageFullPath
-    {
-        get
-        {
-            if (string.IsNullOrEmpty(ImageUrl))
-            {
-                return null;
-            }
-
-            return $"https://localhost:44353{ImageUrl.Substring(1)}";
-        }
-    }
+    public string ImageFullPath => ImageId == Guid.Empty
+           ? $"https://localhost:44353/images/noimage.png"
+           : $"https://superlibrary.blob.core.windows.net/books/{ImageId}";
+            // TODO: Change "noimage.png" to Online
+            //$"https://superlibrary-d7cmb3geg9d8dab7.westeurope-01.azurewebsites.net/images/noimage.png";
 }

@@ -44,9 +44,9 @@ public class Program
         builder.Services.AddTransient<SeedDb>();
 
         // Helpers
-        builder.Services.AddScoped<IUserHelper, UserHelper>(); 
-        builder.Services.AddScoped<IImageHelper, ImageHelper>();
+        builder.Services.AddScoped<IUserHelper, UserHelper>();
         builder.Services.AddScoped<IConverterHelper, ConverterHelper>();
+        builder.Services.AddScoped<IBlobHelper, BlobHelper>();
 
         // Repositories
         builder.Services.AddScoped<IBookRepository, BookRepository>();

@@ -13,7 +13,7 @@
     <thead>
         <tr>
             <th>
-                @Html.DisplayNameFor(model => model.ImageUrl)
+                @Html.DisplayNameFor(model => model.ImageId)
             </th>
             <th>
                 @Html.DisplayNameFor(model => model.Title)
@@ -44,10 +44,7 @@
         {
             <tr>
                 <td>
-                    @if (!string.IsNullOrEmpty(item.ImageUrl))
-                    {
-                        <img src="@Url.Content(item.ImageUrl)" alt="Image" style="width:100px;height:150px;max-width:100%;height:auto" />
-                    }
+                    <img src="@Url.Content(item.ImageFullPath)" alt="Image" style="width:100px;height:150px;max-width:100%;height:auto" />
                 </td>
                 <td>
                     @Html.DisplayFor(modelItem => item.Title)

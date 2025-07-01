@@ -1,4 +1,4 @@
-﻿using System.IO;
+﻿using System;
 using SuperLibrary.Web.Data.Entities;
 using SuperLibrary.Web.Models;
 
@@ -12,12 +12,12 @@ public class ConverterHelper : IConverterHelper
     /// <param name="model"></param>
     /// <param name="isNew"></param>
     /// <returns>Book</returns>
-    public Book ToBook(BookViewModel model, string path, bool isNew)
+    public Book ToBook(BookViewModel model, Guid imageId, bool isNew)
     {
         return new Book
         {
             Id = isNew ? 0 : model.Id,
-            ImageUrl = path,
+            ImageId = imageId,
             Title = model.Title,
             Author = model.Author,
             Publisher = model.Publisher,
@@ -40,7 +40,7 @@ public class ConverterHelper : IConverterHelper
         return new BookViewModel
         {
             Id = book.Id,
-            ImageUrl = book.ImageUrl,
+            ImageId = book.ImageId,
             Title = book.Title,
             Author = book.Author,
             Publisher = book.Publisher,
