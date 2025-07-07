@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using SuperLibrary.Web.Data;
@@ -52,6 +53,7 @@ public class BooksController : Controller
     }
 
     // GET: Books/Create
+    [Authorize]
     public IActionResult Create()
     {
         return View();
@@ -84,6 +86,7 @@ public class BooksController : Controller
     }
 
     // GET: Books/Edit/5
+    [Authorize]
     public async Task<IActionResult> Edit(int? id)
     {
         if (id == null)
@@ -142,6 +145,7 @@ public class BooksController : Controller
     }
 
     // GET: Books/Delete/5
+    [Authorize]
     public async Task<IActionResult> Delete(int? id)
     {
         if (id == null)
