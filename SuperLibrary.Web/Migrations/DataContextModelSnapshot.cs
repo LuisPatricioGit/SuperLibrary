@@ -203,7 +203,7 @@ namespace SuperLibrary.Web.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Books");
+                    b.ToTable("Books", (string)null);
                 });
 
             modelBuilder.Entity("SuperLibrary.Web.Data.Entities.User", b =>

@@ -77,8 +77,7 @@ public class BooksController : Controller
 
             var book = _converterHelper.ToBook(model, imageId, true);
 
-            // TODO: Change User to Logged In
-            book.User = await _userHelper.GetUserByEmailAsync("SuperLibrary.Admin@gmail.com");
+            book.User = await _userHelper.GetUserByEmailAsync(this.User.Identity.Name);
             await _bookRepository.CreateAsync(book);
             return RedirectToAction(nameof(Index));
         }
@@ -124,8 +123,7 @@ public class BooksController : Controller
 
                 var book = _converterHelper.ToBook(model, imageId, false);
 
-                // TODO: Change User to Logged In
-                book.User = await _userHelper.GetUserByEmailAsync("SuperLibrary.Admin@gmail.com");
+                book.User = await _userHelper.GetUserByEmailAsync(this.User.Identity.Name);
                 await _bookRepository.UpdateAsync(book);
             }
             catch (DbUpdateConcurrencyException)

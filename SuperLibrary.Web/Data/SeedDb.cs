@@ -32,7 +32,7 @@ public class SeedDb
                 FirstName = "Admin",
                 LastName = "SuperLibrary",
                 Email = "SuperLibrary.Admin@gmail.com",
-                UserName = "SuperLibrary.Admin@gmail.com",
+                UserName = "SLAdmin",
                 PhoneNumber = "123456789",
             };
 
