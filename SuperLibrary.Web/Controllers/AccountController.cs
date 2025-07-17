@@ -1,5 +1,6 @@
 ﻿using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using SuperLibrary.Web.Data.Entities;
@@ -99,6 +100,7 @@ public class AccountController : Controller
         return View(model);
     }
 
+    [Authorize(Roles = "Admin,Employee,Reader")]
     public async Task<IActionResult> ChangeUser()
     {
         var user = await _userHelper.GetUserByEmailAsync(this.User.Identity.Name);
@@ -138,6 +140,7 @@ public class AccountController : Controller
         return View(model);
     }
 
+    [Authorize(Roles = "Admin,Employee,Reader")]
     public IActionResult ChangePassword()
     {
         return View();

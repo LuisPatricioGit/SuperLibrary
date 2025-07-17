@@ -24,6 +24,11 @@ public class SeedDb
     {
         await _context.Database.EnsureCreatedAsync();
 
+        await _userHelper.CheckRoleAsync("Admin");
+        await _userHelper.CheckRoleAsync("Employee");
+        await _userHelper.CheckRoleAsync("Reader");
+        //await _userHelper.CheckRoleAsync("Anon"); //Anonymous users (Not Used as Anon is Default)
+
         var user = await _userHelper.GetUserByEmailAsync("SuperLibrary.Admin@gmail.com");
         if (user == null)
         {
@@ -42,6 +47,14 @@ public class SeedDb
             {
                 throw new InvalidOperationException("Could not Create the User in Seeder");
             }
+
+            await _userHelper.AddUserToRoleAsync(user, "Admin");
+        }
+
+        var isInRole = await _userHelper.IsUserInRoleAsync(user, "Admin");
+        if (!isInRole)
+        {
+            await _userHelper.AddUserToRoleAsync(user, "Admin");
         }
 
         if (!_context.Books.Any())

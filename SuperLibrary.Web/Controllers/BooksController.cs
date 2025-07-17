@@ -49,11 +49,11 @@ public class BooksController : Controller
             return NotFound();
         }
 
-        return View(book);
+        return View(book); 
     }
 
     // GET: Books/Create
-    [Authorize]
+    [Authorize(Roles = "Admin,Employee")]
     public IActionResult Create()
     {
         return View();
@@ -85,7 +85,7 @@ public class BooksController : Controller
     }
 
     // GET: Books/Edit/5
-    [Authorize]
+    [Authorize(Roles = "Admin,Employee")]
     public async Task<IActionResult> Edit(int? id)
     {
         if (id == null)
@@ -143,7 +143,7 @@ public class BooksController : Controller
     }
 
     // GET: Books/Delete/5
-    [Authorize]
+    [Authorize(Roles = "Admin,Employee")]
     public async Task<IActionResult> Delete(int? id)
     {
         if (id == null)
