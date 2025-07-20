@@ -40,13 +40,13 @@ public class BooksController : Controller
     {
         if (id == null)
         {
-            return NotFound();
+            return new NotFoundViewResult("BookNotFound");
         }
 
         var book = await _bookRepository.GetByIdAsync(id.Value);
         if (book == null)
         {
-            return NotFound();
+            return new NotFoundViewResult("BookNotFound");
         }
 
         return View(book); 
@@ -90,13 +90,13 @@ public class BooksController : Controller
     {
         if (id == null)
         {
-            return NotFound();
+            return new NotFoundViewResult("BookNotFound");
         }
 
         var book = await _bookRepository.GetByIdAsync(id.Value);
         if (book == null)
         {
-            return NotFound();
+            return new NotFoundViewResult("BookNotFound");
         }
 
         var model = _converterHelper.ToBookViewModel(book);
@@ -130,7 +130,7 @@ public class BooksController : Controller
             {
                 if (!await _bookRepository.ExistAsync(model.Id))
                 {
-                    return NotFound();
+                    return new NotFoundViewResult("BookNotFound");
                 }
                 else
                 {
@@ -148,13 +148,13 @@ public class BooksController : Controller
     {
         if (id == null)
         {
-            return NotFound();
+            return new NotFoundViewResult("BookNotFound");
         }
 
         var book = await _bookRepository.GetByIdAsync(id.Value);
         if (book == null)
         {
-            return NotFound();
+            return new NotFoundViewResult("BookNotFound");
         }
 
         return View(book);
@@ -168,5 +168,10 @@ public class BooksController : Controller
         var book = await _bookRepository.GetByIdAsync(id);
         await _bookRepository.DeleteAsync(book);
         return RedirectToAction(nameof(Index));
+    }
+
+    public IActionResult BookNotFound()
+    {
+        return View();
     }
 }

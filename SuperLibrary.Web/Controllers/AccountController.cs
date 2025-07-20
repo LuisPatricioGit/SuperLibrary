@@ -178,4 +178,9 @@ public class AccountController : Controller
         }
         return View(model);
     }
+
+    public IActionResult AccessDenied()
+    {
+        return View();
+    }
 }

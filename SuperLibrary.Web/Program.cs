@@ -51,6 +51,12 @@ public class Program
         // Repositories
         builder.Services.AddScoped<IBookRepository, BookRepository>();
 
+        builder.Services.ConfigureApplicationCookie(options =>
+        {
+            options.LoginPath = "/Account/AccessDenied";
+            options.AccessDeniedPath = "/Account/AccessDenied";
+        });
+
         builder.Services.AddControllersWithViews();
 
         var app = builder.Build();
@@ -69,6 +75,8 @@ public class Program
             // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
             app.UseHsts();
         }
+
+        app.UseStatusCodePagesWithReExecute("/Error/{0}");
 
         app.UseHttpsRedirection();
         app.UseStaticFiles();
