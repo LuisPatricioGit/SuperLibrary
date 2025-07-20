@@ -20,7 +20,7 @@ public class Book : IEntity
     public string Publisher { get; set; }
 
     //[DisplayFormat(DataFormatString = "{YYYY}", ApplyFormatInEditMode = false)]
-    [Display(Name = "Published Year")]
+    [Display(Name = "Year")]
     public DateTime? ReleaseYear { get; set; }
 
     [DisplayFormat(DataFormatString = "{0:N2}", ApplyFormatInEditMode = false)]
@@ -32,7 +32,7 @@ public class Book : IEntity
     [Display(Name = "Image")]
     public Guid ImageId { get; set; }
 
-    [Display(Name = "Is Available")]
+    [Display(Name = "Available")]
     public bool IsAvailable { get; set; }
 
     public bool WasDeleted { get; set; }

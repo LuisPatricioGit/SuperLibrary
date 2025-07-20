@@ -74,11 +74,18 @@ public class AccountController : Controller
                     PhoneNumber = model.PhoneNumber
                 };
 
+
                 var result = await _userHelper.AddUserAsync(user, model.Password);
                 if (result != IdentityResult.Success)
                 {
                     ModelState.AddModelError(string.Empty, "The User couldn't be created");
                     return View(model);
+                }
+
+                var isInRole = await _userHelper.IsUserInRoleAsync(user, "Reader");
+                if (!isInRole)
+                {
+                    await _userHelper.AddUserToRoleAsync(user, "Reader");
                 }
 
                 var loginViewModel = new LoginViewModel
