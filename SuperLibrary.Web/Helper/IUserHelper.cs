@@ -9,6 +9,8 @@ public interface IUserHelper
 {
     Task<User> GetUserByEmailAsync(string email);
 
+    Task<User> GetUserByNameAsync(string userName);
+
     Task<IdentityResult> AddUserAsync(User user, string password);
 
     Task<SignInResult> LoginAsync(LoginViewModel model);

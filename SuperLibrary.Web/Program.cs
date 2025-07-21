@@ -50,6 +50,7 @@ public class Program
 
         // Repositories
         builder.Services.AddScoped<IBookRepository, BookRepository>();
+        builder.Services.AddScoped<ILoanRepository, LoanRepository>();
 
         builder.Services.ConfigureApplicationCookie(options =>
         {

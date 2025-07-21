@@ -50,6 +50,11 @@ public class UserHelper : IUserHelper
         return await _userManager.FindByEmailAsync(email);
     }
 
+    public async Task<User> GetUserByNameAsync(string userName)
+    {
+        return await _userManager.FindByNameAsync(userName);
+    }
+
     public async Task<bool> IsUserInRoleAsync(User user, string roleName)
     {
         return await _userManager.IsInRoleAsync(user, roleName);

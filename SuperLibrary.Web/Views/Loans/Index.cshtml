@@ -1,0 +1,70 @@
+﻿@model IEnumerable<SuperLibrary.Web.Data.Entities.Loan>
+
+@{
+    ViewData["Title"] = "Loans";
+}
+
+<h1>Loans</h1>
+
+<p>
+    <a asp-action="Create" class="btn btn-outline-success"><i class="fa-solid fa-plus"></i> Add Loan</a>
+</p>
+<table class="table">
+    <thead>
+        <tr>
+            @if (this.User.IsInRole("Employee") || this.User.IsInRole("Admin"))
+            {
+                <th>
+                    @Html.DisplayNameFor(model => model.User.Username)
+                </th>
+            }
+            <th>
+                @Html.DisplayNameFor(model => model.LoanDate)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.DueDate)
+            </th>
+            <th>
+                # Lines
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Quantity)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.PenaltyPrice)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model) {
+        <tr>
+            @if (this.User.IsInRole("Employee") || this.User.IsInRole("Admin"))
+            {
+                <td>
+                    @Html.DisplayNameFor(model => model.User.Username)
+                </td>
+            }
+            <td>
+                @Html.DisplayFor(modelItem => item.LoanDate)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.DueDate)
+            </td>
+			<td>
+			    #
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Quantity)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.PenaltyPrice)
+            </td>
+            <td>
+                <a asp-action="Deliver" asp-route-id="@item.Id" id="btnDeliver" class="btn btn-outline-primary"><i class="fa-solid fa-file-lines"></i> Deliver</a>
+                <a asp-action="Delete" asp-route-id="@item.Id" id="btnDelete" class="btn btn-outline-danger"><i class="fa-solid fa-xmark"></i> Delete</a>
+            </td>
+        </tr>
+}
+    </tbody>
+</table>

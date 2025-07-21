@@ -27,7 +27,7 @@ public class SeedDb
         await _userHelper.CheckRoleAsync("Admin");
         await _userHelper.CheckRoleAsync("Employee");
         await _userHelper.CheckRoleAsync("Reader");
-        //await _userHelper.CheckRoleAsync("Anon"); //Anonymous users (Not Used as Anon is Default)
+        await _userHelper.CheckRoleAsync("Anon"); //Anonymous users (Normally not created Used as Anon is Default)
 
         var user = await _userHelper.GetUserByEmailAsync("SuperLibrary.Admin@gmail.com");
         if (user == null)
