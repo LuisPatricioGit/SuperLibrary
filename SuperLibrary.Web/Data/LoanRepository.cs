@@ -1,8 +1,10 @@
 ﻿using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
+using NuGet.Protocol.Resources;
 using SuperLibrary.Web.Data.Entities;
 using SuperLibrary.Web.Helper;
+using SuperLibrary.Web.Models;
 
 namespace SuperLibrary.Web.Data;
 
@@ -15,6 +17,49 @@ public class LoanRepository : GenericRepository<Loan>, ILoanRepository
     {
         _context = context;
         _userHelper = userHelper;
+    }
+
+    /// <summary>
+    /// Adds an Item to the Loan (LoanDetailTemp) for a User.
+    /// </summary>
+    /// <param name="model"></param>
+    /// <param name="userName"></param>
+    /// <returns></returns>
+    public async Task AddItemToLoanAsync(AddItemViewModel model, string userName)
+    {
+        var user = await _userHelper.GetUserByNameAsync(userName);
+        if (user == null)
+        {
+            return;
+        }
+
+        var book = await _context.Books.FindAsync(model.BookId);
+        if (book == null || book.WasDeleted)
+        {
+            return;
+        }
+
+        var loanDetailTemp = await _context.LoanDetailsTemp
+            .Where(ldt => ldt.User == user && ldt.Book == book)
+            .FirstOrDefaultAsync();
+
+        if (loanDetailTemp == null)
+        {
+            loanDetailTemp = new LoanDetailTemp
+            {
+                User = user,
+                Book = book,
+                Quantity = model.Quantity
+            };
+
+            _context.LoanDetailsTemp.Add(loanDetailTemp);
+        }
+        else
+        {
+            loanDetailTemp.Quantity += model.Quantity;
+            _context.LoanDetailsTemp.Update(loanDetailTemp);
+        }
+        await _context.SaveChangesAsync();
     }
 
     /// <summary>
@@ -62,5 +107,21 @@ public class LoanRepository : GenericRepository<Loan>, ILoanRepository
             .ThenInclude(li => li.Book)
             .Where(l => l.User == user && !l.WasDeleted)
             .OrderByDescending(l => l.LoanDate);
+    }
+
+    public async Task ModifyLoanDetailTempQuantityAsync(int id, int quantity)
+    {
+        var loanDetailTemp = await _context.LoanDetailsTemp.FindAsync(id);
+        if (loanDetailTemp == null)
+        {
+            return;
+        }
+
+        loanDetailTemp.Quantity += quantity;
+        if (loanDetailTemp.Quantity > 0)
+        {
+            _context.LoanDetailsTemp.Update(loanDetailTemp);
+            await _context.SaveChangesAsync();
+        }
     }
 }

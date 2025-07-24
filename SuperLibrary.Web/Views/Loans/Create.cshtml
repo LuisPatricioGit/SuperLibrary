@@ -34,17 +34,17 @@
         {
             <tr>
                 <td>
-                    @Html.DisplayFor(modelItem => item.Book.ImageFullPath)
+                    <img src="@Url.Content(item.Book.ImageFullPath)" alt="Image" style="width:100px;height:150px;max-width:100%;height:auto" />
                 </td>
                 <td>
                     @Html.DisplayFor(modelItem => item.Book.Title)
                 </td>
-                <th>
-                    @Html.DisplayNameFor(model => model.Book.Author)
-                </th>
-                <th>
-                    @Html.DisplayNameFor(model => model.Book.Publisher)
-                </th>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Book.Author)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Book.Publisher)
+                </td>
                 <td>
                     @Html.DisplayFor(modelItem => item.Quantity)
                 </td>
