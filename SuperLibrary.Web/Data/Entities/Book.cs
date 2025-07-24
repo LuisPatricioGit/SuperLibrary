@@ -23,8 +23,8 @@ public class Book : IEntity
     [Display(Name = "Year")]
     public DateTime? ReleaseYear { get; set; }
 
-    [DisplayFormat(DataFormatString = "{0:N2}", ApplyFormatInEditMode = false)]
-    public double Copies { get; set; }
+    [DisplayFormat(DataFormatString = "{0:N0}", ApplyFormatInEditMode = false)]
+    public int Copies { get; set; }
 
     [Display(Name = "Genre")]
     public int GenreId { get; set; }

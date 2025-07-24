@@ -12,14 +12,14 @@ public class LoanDetail : IEntity
     [Required]
     public Book Book { get; set; }
 
-    [DisplayFormat(DataFormatString = "{0:N2}")]
+    [DisplayFormat(DataFormatString = "{0:N0}")]
     public int Quantity { get; set; }
 
     [Display(Name = "Penalty")]
     [DisplayFormat(DataFormatString = "0:C2")]
-    public int PenaltyPrice => 1 * DaysOverdue;
+    public decimal PenaltyPrice => 1 * DaysOverdue;
 
     [Display(Name = "Days Overdue")]
-    [DisplayFormat(DataFormatString = "{0:N2}")]
+    [DisplayFormat(DataFormatString = "{0:N0}")]
     public int DaysOverdue { get; set; }
 }

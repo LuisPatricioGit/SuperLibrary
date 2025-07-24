@@ -168,8 +168,8 @@ namespace SuperLibrary.Web.Migrations
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
 
-                    b.Property<double>("Copies")
-                        .HasColumnType("float");
+                    b.Property<int>("Copies")
+                        .HasColumnType("int");
 
                     b.Property<int>("GenreId")
                         .HasColumnType("int");
@@ -203,7 +203,7 @@ namespace SuperLibrary.Web.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Books", (string)null);
+                    b.ToTable("Books");
                 });
 
             modelBuilder.Entity("SuperLibrary.Web.Data.Entities.Loan", b =>
@@ -220,18 +220,18 @@ namespace SuperLibrary.Web.Migrations
                     b.Property<DateTime>("LoanDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<bool>("WasDeleted")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("userId")
+                    b.Property<string>("UserId")
                         .IsRequired()
                         .HasColumnType("nvarchar(450)");
 
+                    b.Property<bool>("WasDeleted")
+                        .HasColumnType("bit");
+
                     b.HasKey("Id");
 
-                    b.HasIndex("userId");
+                    b.HasIndex("UserId");
 
-                    b.ToTable("Loans", (string)null);
+                    b.ToTable("Loans");
                 });
 
             modelBuilder.Entity("SuperLibrary.Web.Data.Entities.LoanDetail", b =>
@@ -263,7 +263,7 @@ namespace SuperLibrary.Web.Migrations
 
                     b.HasIndex("LoanId");
 
-                    b.ToTable("LoanDetails", (string)null);
+                    b.ToTable("LoanDetails");
                 });
 
             modelBuilder.Entity("SuperLibrary.Web.Data.Entities.LoanDetailTemp", b =>
@@ -296,7 +296,7 @@ namespace SuperLibrary.Web.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("LoanDetailsTemp", (string)null);
+                    b.ToTable("LoanDetailsTemp");
                 });
 
             modelBuilder.Entity("SuperLibrary.Web.Data.Entities.User", b =>
@@ -437,13 +437,13 @@ namespace SuperLibrary.Web.Migrations
 
             modelBuilder.Entity("SuperLibrary.Web.Data.Entities.Loan", b =>
                 {
-                    b.HasOne("SuperLibrary.Web.Data.Entities.User", "user")
+                    b.HasOne("SuperLibrary.Web.Data.Entities.User", "User")
                         .WithMany()
-                        .HasForeignKey("userId")
+                        .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("user");
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("SuperLibrary.Web.Data.Entities.LoanDetail", b =>

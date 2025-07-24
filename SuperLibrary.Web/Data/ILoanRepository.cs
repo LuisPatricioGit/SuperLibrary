@@ -7,4 +7,6 @@ namespace SuperLibrary.Web.Data;
 public interface ILoanRepository : IGenericRepository<Loan>
 {
     Task<IQueryable<Loan>> GetLoanAsync(string userName);
+
+    Task<IQueryable<LoanDetailTemp>> GetDetailTempsAsync(string userName);
 }

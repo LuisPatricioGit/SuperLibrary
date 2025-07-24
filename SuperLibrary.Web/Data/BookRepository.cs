@@ -1,4 +1,6 @@
-﻿using System.Linq;
+﻿using System.Collections.Generic;
+using System.Linq;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using SuperLibrary.Web.Data.Entities;
 
@@ -16,5 +18,22 @@ public class BookRepository : GenericRepository<Book>, IBookRepository
     public IQueryable GetAllWithUsers()
     {
         return _context.Books.Include(p => p.User);
+    }
+
+    public IEnumerable<SelectListItem> GetComboBooks()
+    {
+        var list = _context.Books.Select(b => new SelectListItem
+        {
+            Text = b.Title,
+            Value = b.Id.ToString()
+        }).ToList();
+
+        list.Insert(0, new SelectListItem
+        {
+            Text = "(Select a book...)",
+            Value = "0"
+        });
+
+        return list;
     }
 }

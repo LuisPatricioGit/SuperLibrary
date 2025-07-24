@@ -15,11 +15,7 @@ public class User : IdentityUser
     public string FullName => $"{FirstName} {LastName}";
 
     [Display(Name = "Username")]
-    public string Username
-    {
-        get => base.UserName;
-        set => base.UserName = value;
-    }
+    public override string UserName { get; set; }
 
     [Display(Name = "Image")]
     public string ImageUrl { get; set; }

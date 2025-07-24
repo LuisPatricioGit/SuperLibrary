@@ -1,0 +1,135 @@
+﻿@model IEnumerable<SuperLibrary.Web.Data.Entities.LoanDetailTemp>
+@{
+    ViewData["Title"] = "Create";
+}
+
+<h2>Create</h2>
+<p>
+    <a asp-action="AddBook" class="btn btn-outline-success"><i class="fa-solid fa-book-medical"></i> Add Book</a>
+    <a asp-action="ConfirmLoan" class="btn btn-outline-primary" id="btnConfirm"><i class="fa-solid fa-check"></i> Confirm Loan</a>
+</p>
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.Book.ImageId)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Book)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Book.Author)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Book.Publisher)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Quantity)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Book.ImageFullPath)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Book.Title)
+                </td>
+                <th>
+                    @Html.DisplayNameFor(model => model.Book.Author)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Book.Publisher)
+                </th>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Quantity)
+                </td>
+                <td id="@item.Id">
+                    <a asp-action="Increase" asp-route-id="@item.Id" class="btn btn-outline-warning"><i class="fa fa-plus"></i></a>
+                    <a asp-action="Decrease" asp-route-id="@item.Id" class="btn btn-outline-info"><i class="fa fa-minus"></i></a>
+                    <a asp-action="DeleteItem" asp-route-id="@item.Id" class="btn btn-outline-danger" id="btnDeleteItem"> Remove</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+
+<div id="confirmDialog" class="modal fade">
+    <div class="modal-dialog modal-sm">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">Confirm Loan</h4>
+                <button type="button" class="close" data-dismiss="modal"><i class="fa fa-window-close"></i></button>
+            </div>
+            <div class="modal-body">
+                <p>Are all the Books in the loan?</p>
+                <p>(Loans cannot be cancelled/modified after comfirmation)</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-success" id="btnYesConfirm">Yes</button>
+                <button type="button" class="btn btn-danger" id="btnNoConfirm">No</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="deleteDialog" class="modal fade">
+    <div class="modal-dialog modal-sm">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">Delete</h4>
+                <button type="button" class="close" data-dismiss="modal"><i class="fa fa-window-close"></i></button>
+            </div>
+            <div class="modal-body">
+                <p>Are you sure you want to remove the Book(s) from the Loan?</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-success" id="btnYesDelete">Yes</button>
+                <button type="button" class="btn btn-danger" id="btnNoDelete">No</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script type="text/javascript">
+        $(document).ready(function(){
+
+            var id = 0;
+
+            $("#btnConfirm").click(function(){
+                $("#confirmDialog").modal("show");
+                return false;
+            });
+
+            $("#btnNoConfirm").click(function(){
+                $("#confirmDialog").modal("hide");
+                return false;
+            });
+
+            $("#btnYesConfirm").click(function(){
+                window.location.href = "/Loans/ConfirmLoan";
+            });
+
+            $("a[id*=btnDeleteItem]").click(function(){
+                id=$(this).parent()[0].id;
+                $("#deleteDialog").modal("show");
+                return false;
+            });
+
+            $("#btnNoDelete").click(function(){
+                $("#deleteDialog").modal("hide");
+                return false;
+            });
+
+            $("#btnYesDelete").click(function(){
+                window.location.href = "/Loans/DeleteItem/" + id;
+            });
+        });
+    </script>
+}

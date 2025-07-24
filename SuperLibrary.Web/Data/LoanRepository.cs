@@ -18,6 +18,25 @@ public class LoanRepository : GenericRepository<Loan>, ILoanRepository
     }
 
     /// <summary>
+    /// Returns all LoanDetailTemps for a User.
+    /// </summary>
+    /// <param name="userName"></param>
+    /// <returns>LoanDetailsTemp</returns>
+    public async Task<IQueryable<LoanDetailTemp>> GetDetailTempsAsync(string userName)
+    {
+        var user = await _userHelper.GetUserByNameAsync(userName);
+        if (user == null)
+        {
+            return null;
+        }
+
+        return _context.LoanDetailsTemp
+            .Include(ldt => ldt.Book)
+            .Where(ldt => ldt.User == user && !ldt.WasDeleted)
+            .OrderByDescending(ldt => ldt.Book.Title);
+    }
+
+    /// <summary>
     /// Returns all Loans for a User or all Loans if the User is an Employee.
     /// </summary>
     /// <param name="email"></param>

@@ -25,14 +25,14 @@ public class Loan : IEntity
 
     public IEnumerable<LoanDetail> LoanItems { get; set; }
 
-    [DisplayFormat(DataFormatString = "{0:N2}")]
-    public double Quantity => LoanItems == null ? 0 : LoanItems.Sum(li => li.Quantity);
+    [DisplayFormat(DataFormatString = "{0:N0}")]
+    public int Quantity => LoanItems == null ? 0 : LoanItems.Sum(li => li.Quantity);
 
     [Display(Name = "Penalty")]
     [DisplayFormat(DataFormatString = "{0:C2}")]
     public decimal PenaltyPrice => LoanItems == null ? 0 : LoanItems.Sum(li => li.PenaltyPrice);
 
     [Display(Name = "Days Overdue")]
-    [DisplayFormat(DataFormatString = "{0:N2}")]
+    [DisplayFormat(DataFormatString = "{0:N0}")]
     public int DaysOverdue => (DateTime.Now - DueDate).Days > 0 ? (DateTime.Now - DueDate).Days : 0;
 }
