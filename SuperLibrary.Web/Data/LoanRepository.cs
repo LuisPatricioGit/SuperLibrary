@@ -63,6 +63,23 @@ public class LoanRepository : GenericRepository<Loan>, ILoanRepository
     }
 
     /// <summary>
+    /// Removes a LoanDetailTemp by its ID.
+    /// </summary>
+    /// <param name="id"></param>
+    /// <returns></returns>
+    public async Task DeleteLoanDetailTempAsync(int id)
+    {
+        var loanDetailTemp = await _context.LoanDetailsTemp.FindAsync(id);
+        if (loanDetailTemp == null)
+        {
+            return;
+        }
+
+        _context.LoanDetailsTemp.Remove(loanDetailTemp);
+        await _context.SaveChangesAsync();
+    }
+
+    /// <summary>
     /// Returns all LoanDetailTemps for a User.
     /// </summary>
     /// <param name="userName"></param>
@@ -109,6 +126,12 @@ public class LoanRepository : GenericRepository<Loan>, ILoanRepository
             .OrderByDescending(l => l.LoanDate);
     }
 
+    /// <summary>
+    /// Modifies the quantity of a LoanDetailTemp by adding the specified quantity.
+    /// </summary>
+    /// <param name="id"></param>
+    /// <param name="quantity"></param>
+    /// <returns></returns>
     public async Task ModifyLoanDetailTempQuantityAsync(int id, int quantity)
     {
         var loanDetailTemp = await _context.LoanDetailsTemp.FindAsync(id);

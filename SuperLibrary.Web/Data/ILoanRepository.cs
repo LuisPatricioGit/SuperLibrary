@@ -14,4 +14,6 @@ public interface ILoanRepository : IGenericRepository<Loan>
     Task AddItemToLoanAsync(AddItemViewModel model, string userName);
 
     Task ModifyLoanDetailTempQuantityAsync(int id, int quantity);
+
+    Task DeleteLoanDetailTempAsync(int id);
 }
