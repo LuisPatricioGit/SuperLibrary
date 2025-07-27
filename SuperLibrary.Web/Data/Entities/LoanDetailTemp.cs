@@ -17,13 +17,5 @@ public class LoanDetailTemp : IEntity
     [DisplayFormat(DataFormatString = "{0:N0}")]
     public int Quantity { get; set; }
 
-    [Display(Name = "Penalty")]
-    [DisplayFormat(DataFormatString = "0:C2")]
-    public decimal PenaltyPrice => 2 * DaysOverdue; //2€ per day overdue
-
-    [Display(Name = "Days Overdue")]
-    [DisplayFormat(DataFormatString = "{0:N0}")]
-    public int DaysOverdue { get; set; }
-
-    public bool WasDeleted { get ; set; }
+    public bool WasDeleted { get; set; }
 }

@@ -15,17 +15,17 @@
             @if (this.User.IsInRole("Employee") || this.User.IsInRole("Admin"))
             {
                 <th>
-                    @Html.DisplayNameFor(model => model.User.UserName)
+                    @Html.DisplayNameFor(model => model.User.FullName)
                 </th>
             }
             <th>
-                @Html.DisplayNameFor(model => model.LoanDate)
+                @Html.DisplayNameFor(model => model.LoanDateLocal)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.DueDate)
+                @Html.DisplayNameFor(model => model.DueDateLocal)
             </th>
             <th>
-                # Lines
+                @Html.DisplayNameFor(model => model.Lines)
             </th>
             <th>
                 @Html.DisplayNameFor(model => model.Quantity)
@@ -37,22 +37,22 @@
         </tr>
     </thead>
     <tbody>
-@foreach (var item in Model) {
+        @foreach (var item in Model) {
         <tr>
             @if (this.User.IsInRole("Employee") || this.User.IsInRole("Admin"))
             {
                 <td>
-                    @Html.DisplayNameFor(model => model.User.UserName)
+                    @Html.DisplayFor(model => item.User.FullName)
                 </td>
             }
             <td>
-                @Html.DisplayFor(modelItem => item.LoanDate)
+                @Html.DisplayFor(modelItem => item.LoanDateLocal)
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.DueDate)
+                @Html.DisplayFor(modelItem => item.DueDateLocal)
             </td>
 			<td>
-			    #
+                @Html.DisplayFor(modelItem => item.Lines)
             </td>
             <td>
                 @Html.DisplayFor(modelItem => item.Quantity)
@@ -62,9 +62,12 @@
             </td>
             <td>
                 <a asp-action="Deliver" asp-route-id="@item.Id" id="btnDeliver" class="btn btn-outline-primary"><i class="fa-solid fa-file-lines"></i> Deliver</a>
-                <a asp-action="Delete" asp-route-id="@item.Id" id="btnDelete" class="btn btn-outline-danger"><i class="fa-solid fa-xmark"></i> Delete</a>
+                @if (this.User.IsInRole("Employee"))
+                {
+                    <a asp-action="Delete" asp-route-id="@item.Id" id="btnDelete" class="btn btn-outline-danger"><i class="fa-solid fa-xmark"></i> Delete</a>
+                }
             </td>
         </tr>
-}
+        }
     </tbody>
 </table>

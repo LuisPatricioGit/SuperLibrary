@@ -26,6 +26,9 @@ public class Loan : IEntity
     public IEnumerable<LoanDetail> LoanItems { get; set; }
 
     [DisplayFormat(DataFormatString = "{0:N0}")]
+    public int Lines => LoanItems == null ? 0 : LoanItems.Count();
+
+    [DisplayFormat(DataFormatString = "{0:N0}")]
     public int Quantity => LoanItems == null ? 0 : LoanItems.Sum(li => li.Quantity);
 
     [Display(Name = "Penalty")]
@@ -35,4 +38,12 @@ public class Loan : IEntity
     [Display(Name = "Days Overdue")]
     [DisplayFormat(DataFormatString = "{0:N0}")]
     public int DaysOverdue => (DateTime.Now - DueDate).Days > 0 ? (DateTime.Now - DueDate).Days : 0;
+
+    [Display(Name = "Loan Date")]
+    [DisplayFormat(DataFormatString = "{0:dd/MM/yyyy HH:mm}", ApplyFormatInEditMode = false)]
+    public DateTime? LoanDateLocal => this.LoanDate == null ? null : this.LoanDate.ToLocalTime();
+
+    [Display(Name = "Due Date")]
+    [DisplayFormat(DataFormatString = "{0:dd/MM/yyyy HH:mm}", ApplyFormatInEditMode = false)]
+    public DateTime? DueDateLocal => this.DueDate == null ? null : this.DueDate.ToLocalTime();
 }

@@ -77,7 +77,7 @@ public class BooksController : Controller
 
             var book = _converterHelper.ToBook(model, imageId, true);
 
-            book.User = await _userHelper.GetUserByEmailAsync(this.User.Identity.Name);
+            book.User = await _userHelper.GetUserByNameAsync(this.User.Identity.Name);
             await _bookRepository.CreateAsync(book);
             return RedirectToAction(nameof(Index));
         }
@@ -123,7 +123,7 @@ public class BooksController : Controller
 
                 var book = _converterHelper.ToBook(model, imageId, false);
 
-                book.User = await _userHelper.GetUserByEmailAsync(this.User.Identity.Name);
+                book.User = await _userHelper.GetUserByNameAsync(this.User.Identity.Name);
                 await _bookRepository.UpdateAsync(book);
             }
             catch (DbUpdateConcurrencyException)

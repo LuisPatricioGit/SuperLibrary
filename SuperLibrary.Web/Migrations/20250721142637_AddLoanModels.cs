@@ -49,14 +49,14 @@ namespace SuperLibrary.Web.Migrations
                     WasDeleted = table.Column<bool>(type: "bit", nullable: false),
                     LoanDate = table.Column<DateTime>(type: "datetime2", nullable: false),
                     DueDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    userId = table.Column<string>(type: "nvarchar(450)", nullable: false)
+                    UserId = table.Column<string>(type: "nvarchar(450)", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Loans", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Loans_AspNetUsers_userId",
-                        column: x => x.userId,
+                        name: "FK_Loans_AspNetUsers_UserId",
+                        column: x => x.UserId,
                         principalTable: "AspNetUsers",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
@@ -111,9 +111,9 @@ namespace SuperLibrary.Web.Migrations
                 column: "UserId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Loans_userId",
+                name: "IX_Loans_UserId",
                 table: "Loans",
-                column: "userId");
+                column: "UserId");
         }
 
         /// <inheritdoc />

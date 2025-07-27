@@ -16,4 +16,6 @@ public interface ILoanRepository : IGenericRepository<Loan>
     Task ModifyLoanDetailTempQuantityAsync(int id, int quantity);
 
     Task DeleteLoanDetailTempAsync(int id);
+
+    Task<bool> ConfirmLoanAsync(string userName);
 }

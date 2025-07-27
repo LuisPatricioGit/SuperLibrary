@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using NuGet.Protocol.Resources;
@@ -62,6 +63,45 @@ public class LoanRepository : GenericRepository<Loan>, ILoanRepository
         await _context.SaveChangesAsync();
     }
 
+    public async Task<bool> ConfirmLoanAsync(string userName)
+    {
+        var user = await _userHelper.GetUserByNameAsync(userName);
+        if (user == null)
+        {
+            return false;
+        }
+
+        var loanTemp = await _context.LoanDetailsTemp
+            .Include(l => l.Book)
+            .Where(l => l.User == user && !l.WasDeleted)
+            .ToListAsync();
+
+        if (loanTemp == null || loanTemp.Count == 0)
+        {
+            return false;
+        }
+
+        var details = loanTemp.Select(l => new LoanDetail
+        {
+            Book = l.Book,
+            Quantity = l.Quantity,
+            User = user
+        }).ToList();
+
+        var loan = new Loan
+        {
+            User = user,
+            LoanDate = DateTime.UtcNow,
+            DueDate = DateTime.UtcNow.AddDays(15), // TODO: Adjust due date per role
+            LoanItems = details
+        };
+
+        await CreateAsync(loan);
+        _context.LoanDetailsTemp.RemoveRange(loanTemp);
+        await _context.SaveChangesAsync();
+        return true;
+    }
+
     /// <summary>
     /// Removes a LoanDetailTemp by its ID.
     /// </summary>
@@ -114,6 +154,7 @@ public class LoanRepository : GenericRepository<Loan>, ILoanRepository
         if (await _userHelper.IsUserInRoleAsync(user, "Employee"))
         {
             return _context.Loans
+                .Include(l => l.User)
                 .Include(l => l.LoanItems)
                 .ThenInclude(li => li.Book)
                 .OrderByDescending(l => l.LoanDate);

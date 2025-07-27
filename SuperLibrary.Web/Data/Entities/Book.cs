@@ -19,8 +19,8 @@ public class Book : IEntity
     [MaxLength(50)]
     public string Publisher { get; set; }
 
-    //[DisplayFormat(DataFormatString = "{YYYY}", ApplyFormatInEditMode = false)]
     [Display(Name = "Year")]
+    [DisplayFormat(DataFormatString = "{0:yyyy}", ApplyFormatInEditMode = false)]
     public DateTime? ReleaseYear { get; set; }
 
     [DisplayFormat(DataFormatString = "{0:N0}", ApplyFormatInEditMode = false)]
