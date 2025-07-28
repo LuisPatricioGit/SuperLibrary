@@ -14,24 +14,20 @@ public class HomeController : Controller
         _logger = logger;
     }
 
+    /// <summary>
+    /// Displays the home page of the application.
+    /// </summary>
+    /// <returns></returns>
     public IActionResult Index()
     {
         return View();
     }
 
+    /// <summary>
+    /// Displays the About page of the application.
+    /// </summary>
+    /// <returns></returns>
     public IActionResult Privacy()
-    {
-        return View();
-    }
-
-    [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
-    public IActionResult Error()
-    {
-        return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
-    }
-
-    [Route("Error/404")]
-    public IActionResult Error404()
     {
         return View();
     }

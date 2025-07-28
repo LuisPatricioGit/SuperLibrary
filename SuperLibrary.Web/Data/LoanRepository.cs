@@ -63,6 +63,11 @@ public class LoanRepository : GenericRepository<Loan>, ILoanRepository
         await _context.SaveChangesAsync();
     }
 
+    /// <summary>
+    /// Confirms the Loan for a User by creating a Loan from LoanDetailsTemp and removing the temporary details.
+    /// </summary>
+    /// <param name="userName"></param>
+    /// <returns></returns>
     public async Task<bool> ConfirmLoanAsync(string userName)
     {
         var user = await _userHelper.GetUserByNameAsync(userName);

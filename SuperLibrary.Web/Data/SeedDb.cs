@@ -20,6 +20,10 @@ public class SeedDb
         _random = new Random();
     }
 
+    /// <summary>
+    /// This method is used to seed the database with initial data.
+    /// </summary>
+    /// <returns></returns>
     public async Task SeedAsync()
     {
         await _context.Database.EnsureCreatedAsync();
@@ -50,6 +54,17 @@ public class SeedDb
         await _context.SaveChangesAsync();
     }
 
+    /// <summary>
+    /// This method is used to add a user to the database.
+    /// </summary>
+    /// <param name="firstName"></param>
+    /// <param name="lastName"></param>
+    /// <param name="email"></param>
+    /// <param name="userName"></param>
+    /// <param name="phoneNumber"></param>
+    /// <param name="role"></param>
+    /// <returns></returns>
+    /// <exception cref="InvalidOperationException"></exception>
     private async Task AddUser(string firstName, string lastName, string email, string userName, string phoneNumber, string role)
     {
         var user = await _userHelper.GetUserByEmailAsync(email);
@@ -81,6 +96,13 @@ public class SeedDb
         }
     }
 
+    /// <summary>
+    /// This method is used to add a book to the database.
+    /// </summary>
+    /// <param name="title"></param>
+    /// <param name="author"></param>
+    /// <param name="publisher"></param>
+    /// <param name="user"></param>
     private void AddBook(string title, string author, string publisher, User user)
     {
         _context.Books.Add(new Book

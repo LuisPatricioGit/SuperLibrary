@@ -29,13 +29,20 @@ public class BooksController : Controller
         _converterHelper = converterHelper;
     }
 
-    // GET: Books
+    /// <summary>
+    /// Displays a list of all books in the library, ordered by title.
+    /// </summary>
+    /// <returns></returns>
     public IActionResult Index()
     {
         return View(_bookRepository.GetAll().OrderBy(b => b.Title));
     }
 
-    // GET: Books/Details/5
+    /// <summary>
+    /// Displays the details of a specific book based on its ID.
+    /// </summary>
+    /// <param name="id"></param>
+    /// <returns></returns>
     public async Task<IActionResult> Details(int? id)
     {
         if (id == null)
@@ -52,16 +59,21 @@ public class BooksController : Controller
         return View(book); 
     }
 
-    // GET: Books/Create
+    /// <summary>
+    /// Displays the view for creating a new book entry.
+    /// </summary>
+    /// <returns></returns>
     [Authorize(Roles = "Admin,Employee")]
     public IActionResult Create()
     {
         return View();
     }
 
-    // POST: Books/Create
-    // To protect from overposting attacks, enable the specific properties you want to bind to.
-    // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
+    /// <summary>
+    /// Handles the submission of a new book entry.
+    /// </summary>
+    /// <param name="model"></param>
+    /// <returns></returns>
     [HttpPost]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Create(BookViewModel model)
@@ -84,7 +96,11 @@ public class BooksController : Controller
         return View(model);
     }
 
-    // GET: Books/Edit/5
+    /// <summary>
+    /// Displays the view for editing an existing book entry based on its ID.
+    /// </summary>
+    /// <param name="id"></param>
+    /// <returns></returns>
     [Authorize(Roles = "Admin,Employee")]
     public async Task<IActionResult> Edit(int? id)
     {
@@ -103,9 +119,11 @@ public class BooksController : Controller
         return View(model);
     }
 
-    // POST: Books/Edit/5
-    // To protect from overposting attacks, enable the specific properties you want to bind to.
-    // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
+    /// <summary>
+    /// Handles the submission of the edited book details.
+    /// </summary>
+    /// <param name="model"></param>
+    /// <returns></returns>
     [HttpPost]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Edit(BookViewModel model)
@@ -142,7 +160,11 @@ public class BooksController : Controller
         return View(model);
     }
 
-    // GET: Books/Delete/5
+    /// <summary>
+    /// Displays the confirmation view for deleting a book based on its ID.
+    /// </summary>
+    /// <param name="id"></param>
+    /// <returns></returns>
     [Authorize(Roles = "Admin,Employee")]
     public async Task<IActionResult> Delete(int? id)
     {
@@ -160,16 +182,39 @@ public class BooksController : Controller
         return View(book);
     }
 
-    // POST: Books/Delete/5
+    /// <summary>
+    /// Handles the deletion of a book entry based on its ID.
+    /// </summary>
+    /// <param name="id"></param>
+    /// <returns></returns>
     [HttpPost, ActionName("Delete")]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> DeleteConfirmed(int id)
     {
         var book = await _bookRepository.GetByIdAsync(id);
-        await _bookRepository.DeleteAsync(book);
-        return RedirectToAction(nameof(Index));
+        
+        try
+        {
+            await _bookRepository.DeleteAsync(book);
+            return RedirectToAction(nameof(Index));
+        }
+        catch (DbUpdateException ex)
+        {
+            if (ex.InnerException != null && ex.InnerException.Message.Contains("DELETE"))
+            {
+                ViewBag.ErrorTitle = $"Book {book.Title} is beiong used...</br>";
+                ViewBag.ErrorMessage = $"Book {book.Title} can't be deleted due to existing loans/reservations</br></br>" +
+                    $"Please delete all associated Loans and Reservations to Delete the current book."; 
+            }
+
+            return View("Error");
+        }
     }
 
+    /// <summary>
+    /// Displays a view when a book is not found, typically for 404 errors.
+    /// </summary>
+    /// <returns></returns>
     public IActionResult BookNotFound()
     {
         return View();

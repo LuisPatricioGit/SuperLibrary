@@ -18,18 +18,30 @@ public class LoansController : Controller
         _bookRepository = bookRepository;
     }
 
+    /// <summary>
+    /// Displays the index view for loans, showing the current user's loan details.
+    /// </summary>
+    /// <returns></returns>
     public async Task<IActionResult> Index()
     {
         var model = await _loanRepository.GetLoanAsync(this.User.Identity.Name);
         return View(model);
     }
 
+    /// <summary>
+    /// Displays the view for creating a new loan, showing temporary loan details for the current user.
+    /// </summary>
+    /// <returns></returns>
     public async Task<IActionResult> Create()
     {
         var model = await _loanRepository.GetDetailTempsAsync(this.User.Identity.Name);
         return View(model);
     }
 
+    /// <summary>
+    /// Displays the view for adding a new book to the loan.
+    /// </summary>
+    /// <returns></returns>
     public IActionResult AddBook()
     {
         var model = new AddItemViewModel
@@ -41,6 +53,11 @@ public class LoansController : Controller
         return View(model);
     }
 
+    /// <summary>
+    /// Handles the addition of a new book to the loan based on the provided model.
+    /// </summary>
+    /// <param name="model"></param>
+    /// <returns></returns>
     [HttpPost]
     public async Task<IActionResult> AddBook(AddItemViewModel model)
     {
@@ -53,6 +70,11 @@ public class LoansController : Controller
         return View(model);
     }
 
+    /// <summary>
+    /// Deletes a specific item from the temporary loan details based on the provided ID.
+    /// </summary>
+    /// <param name="id"></param>
+    /// <returns></returns>
     public async Task<IActionResult> DeleteItem(int? id)
     {
         if (id == null)
@@ -64,6 +86,11 @@ public class LoansController : Controller
         return RedirectToAction("Create");
     }
 
+    /// <summary>
+    /// Increases the quantity of a specific item in the temporary loan details by 1 based on the provided ID.
+    /// </summary>
+    /// <param name="id"></param>
+    /// <returns></returns>
     public async Task<IActionResult> Increase(int? id)
     {
         if (id == null)
@@ -75,6 +102,11 @@ public class LoansController : Controller
         return RedirectToAction("Create");
     }
 
+    /// <summary>
+    /// Decreases the quantity of a specific item in the temporary loan details by 1 based on the provided ID.
+    /// </summary>
+    /// <param name="id"></param>
+    /// <returns></returns>
     public async Task<IActionResult> Decrease(int? id)
     {
         if (id == null)
@@ -86,6 +118,10 @@ public class LoansController : Controller
         return RedirectToAction("Create");
     }
 
+    /// <summary>
+    /// Confirms the loan for the current user, finalizing the loan process and redirecting to the index view.
+    /// </summary>
+    /// <returns></returns>
     public async Task<IActionResult> ConfirmLoan()
     {
         var response = await _loanRepository.ConfirmLoanAsync(this.User.Identity.Name);

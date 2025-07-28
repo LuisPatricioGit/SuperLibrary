@@ -15,11 +15,19 @@ public class BookRepository : GenericRepository<Book>, IBookRepository
         _context = context;
     }
 
+    /// <summary>
+    /// Gets all Books with their associated Users.
+    /// </summary>
+    /// <returns></returns>
     public IQueryable GetAllWithUsers()
     {
         return _context.Books.Include(p => p.User);
     }
 
+    /// <summary>
+    /// Gets a list of books for a dropdown or select list.
+    /// </summary>
+    /// <returns></returns>
     public IEnumerable<SelectListItem> GetComboBooks()
     {
         var list = _context.Books.Select(b => new SelectListItem

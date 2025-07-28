@@ -18,6 +18,10 @@ public class AccountController : Controller
         _userHelper = userHelper;
     }
 
+    /// <summary>
+    /// Displays the login view if the user is not authenticated, otherwise redirects to the home page.
+    /// </summary>
+    /// <returns></returns>
     public IActionResult Login()
     {
         if (User.Identity.IsAuthenticated)
@@ -27,6 +31,11 @@ public class AccountController : Controller
         return View();
     }
 
+    /// <summary>
+    /// Handles the login process for users.
+    /// </summary>
+    /// <param name="model"></param>
+    /// <returns></returns>
     [HttpPost]
     public async Task<IActionResult> Login(LoginViewModel model)
     {
@@ -46,17 +55,30 @@ public class AccountController : Controller
         return View(model);
     }
 
+    /// <summary>
+    /// Logs out the current user and redirects to the home page.
+    /// </summary>
+    /// <returns></returns>
     public async Task<IActionResult> Logout()
     {
         await _userHelper.LogoutAsync();
         return RedirectToAction("Index", "Home");
     }
 
+    /// <summary>
+    /// Displays the registration view for new users.
+    /// </summary>
+    /// <returns></returns>
     public IActionResult Register()
     {
         return View();
     }
 
+    /// <summary>
+    /// Handles the registration process for new users.
+    /// </summary>
+    /// <param name="model"></param>
+    /// <returns></returns>
     [HttpPost]
     public async Task<IActionResult> Register(RegisterNewUserViewModel model)
     {
@@ -107,6 +129,10 @@ public class AccountController : Controller
         return View(model);
     }
 
+    /// <summary>
+    /// Displays the view for changing user details such as name and phone number.
+    /// </summary>
+    /// <returns></returns>
     [Authorize(Roles = "Admin,Employee,Reader")]
     public async Task<IActionResult> ChangeUser()
     {
@@ -121,6 +147,11 @@ public class AccountController : Controller
         return View(model);
     }
 
+    /// <summary>
+    /// Handles the process of changing user details such as name and phone number.
+    /// </summary>
+    /// <param name="model"></param>
+    /// <returns></returns>
     [HttpPost]
     public async Task<IActionResult> ChangeUser(ChangeUserViewModel model)
     {
@@ -147,12 +178,21 @@ public class AccountController : Controller
         return View(model);
     }
 
+    /// <summary>
+    /// Displays the view for changing the user's password.
+    /// </summary>
+    /// <returns></returns>
     [Authorize(Roles = "Admin,Employee,Reader")]
     public IActionResult ChangePassword()
     {
         return View();
     }
 
+    /// <summary>
+    /// Handles the process of changing the user's password.
+    /// </summary>
+    /// <param name="model"></param>
+    /// <returns></returns>
     [HttpPost]
     public async Task<IActionResult> ChangePassword(ChangePasswordViewModel model)
     {
@@ -179,6 +219,10 @@ public class AccountController : Controller
         return View(model);
     }
 
+    /// <summary>
+    /// Displays the access denied view when a user tries to access a resource they are not authorized for.
+    /// </summary>
+    /// <returns></returns>
     public IActionResult AccessDenied()
     {
         return View();
