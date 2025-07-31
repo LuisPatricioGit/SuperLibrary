@@ -40,8 +40,7 @@ public class Book : IEntity
     public User User { get; set; }
 
     public string ImageFullPath => ImageId == Guid.Empty
-           ? $"https://localhost:44353/images/noimage.png"
+           ? $"https://superlibrary-d7cmb3geg9d8dab7.westeurope-01.azurewebsites.net/images/noimage.png"
            : $"https://superlibrary.blob.core.windows.net/books/{ImageId}";
-            // TODO: Change "noimage.png" to Online
-            //$"https://superlibrary-d7cmb3geg9d8dab7.westeurope-01.azurewebsites.net/images/noimage.png";
+           // $"https://localhost:44353/images/noimage.png" // Local version
 }

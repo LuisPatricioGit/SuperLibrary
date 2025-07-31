@@ -20,6 +20,10 @@ public class Loan : IEntity
     [DisplayFormat(DataFormatString = "{0:yyyy/MM/dd hh:mm tt}", ApplyFormatInEditMode = false)]
     public DateTime DueDate { get; set; }
 
+    [Display(Name = "Delivery Date")]
+    [DisplayFormat(DataFormatString = "{0:yyyy/MM/dd hh:mm tt}", ApplyFormatInEditMode = false)]
+    public DateTime DeliveryDate { get; set; }
+
     [Required]
     public User User { get; set; }
 
@@ -46,4 +50,8 @@ public class Loan : IEntity
     [Display(Name = "Due Date")]
     [DisplayFormat(DataFormatString = "{0:dd/MM/yyyy HH:mm}", ApplyFormatInEditMode = false)]
     public DateTime? DueDateLocal => this.DueDate == null ? null : this.DueDate.ToLocalTime();
+
+    [Display(Name = "Delivery Date")]
+    [DisplayFormat(DataFormatString = "{0:dd/MM/yyyy HH:mm}", ApplyFormatInEditMode = false)]
+    public DateTime? DeliveryDateLocal => this.DeliveryDate == null ? null : this.DeliveryDate.ToLocalTime();
 }

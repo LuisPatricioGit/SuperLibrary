@@ -214,6 +214,9 @@ namespace SuperLibrary.Web.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<DateTime>("DeliveryDate")
+                        .HasColumnType("datetime2");
+
                     b.Property<DateTime>("DueDate")
                         .HasColumnType("datetime2");
 
@@ -254,6 +257,10 @@ namespace SuperLibrary.Web.Migrations
                     b.Property<int>("Quantity")
                         .HasColumnType("int");
 
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
                     b.Property<bool>("WasDeleted")
                         .HasColumnType("bit");
 
@@ -262,6 +269,8 @@ namespace SuperLibrary.Web.Migrations
                     b.HasIndex("BookId");
 
                     b.HasIndex("LoanId");
+
+                    b.HasIndex("UserId");
 
                     b.ToTable("LoanDetails");
                 });
@@ -275,9 +284,6 @@ namespace SuperLibrary.Web.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<int>("BookId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("DaysOverdue")
                         .HasColumnType("int");
 
                     b.Property<int>("Quantity")
@@ -440,7 +446,7 @@ namespace SuperLibrary.Web.Migrations
                     b.HasOne("SuperLibrary.Web.Data.Entities.User", "User")
                         .WithMany()
                         .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.Navigation("User");
@@ -451,14 +457,22 @@ namespace SuperLibrary.Web.Migrations
                     b.HasOne("SuperLibrary.Web.Data.Entities.Book", "Book")
                         .WithMany()
                         .HasForeignKey("BookId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.HasOne("SuperLibrary.Web.Data.Entities.Loan", null)
                         .WithMany("LoanItems")
                         .HasForeignKey("LoanId");
 
+                    b.HasOne("SuperLibrary.Web.Data.Entities.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
                     b.Navigation("Book");
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("SuperLibrary.Web.Data.Entities.LoanDetailTemp", b =>
@@ -466,13 +480,13 @@ namespace SuperLibrary.Web.Migrations
                     b.HasOne("SuperLibrary.Web.Data.Entities.Book", "Book")
                         .WithMany()
                         .HasForeignKey("BookId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.HasOne("SuperLibrary.Web.Data.Entities.User", "User")
                         .WithMany()
                         .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.Navigation("Book");

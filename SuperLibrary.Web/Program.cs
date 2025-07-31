@@ -24,20 +24,19 @@ public class Program
         // Services
         builder.Services.AddIdentity<User, IdentityRole>(cfg =>
         {
-            // TODO: Change Security settings
+            // Security settings
             cfg.User.RequireUniqueEmail = true;
-            cfg.Password.RequireDigit = false;
-            cfg.Password.RequiredUniqueChars = 0;
-            cfg.Password.RequireLowercase = false;
-            cfg.Password.RequireUppercase = false;
-            cfg.Password.RequireNonAlphanumeric = false;
+            cfg.Password.RequireDigit = true;
+            cfg.Password.RequiredUniqueChars = 1;
+            cfg.Password.RequireLowercase = true;
+            cfg.Password.RequireUppercase = true;
+            cfg.Password.RequireNonAlphanumeric = true;
             cfg.Password.RequiredLength = 6;
         }).AddEntityFrameworkStores<DataContext>();
 
         builder.Services.AddDbContext<DataContext>(o =>
         {
-            // TODO: Change "LocalConnection" to "OnlineConnection"
-            o.UseSqlServer(builder.Configuration.GetConnectionString("LocalConnection"));
+            o.UseSqlServer(builder.Configuration.GetConnectionString("OnlineConnection"));
         });
 
         // Seeder

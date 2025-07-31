@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SuperLibrary.Web.Data;
@@ -131,5 +132,49 @@ public class LoansController : Controller
         }
 
         return RedirectToAction("Create");
+    }
+
+    /// <summary>
+    /// Displays the view for delivering a loan based on the provided ID, initializing the delivery date to today.
+    /// </summary>
+    /// <param name="id"></param>
+    /// <returns></returns>
+    public async Task<IActionResult> Deliver(int? id)
+    {
+        if (id == null)
+        {
+            return NotFound();
+        }
+
+        var loan = await _loanRepository.GetLoanAsync(id.Value);
+        if (loan == null || loan.WasDeleted)
+        {
+            return NotFound();
+        }
+
+        var model = new DeliveryViewModel
+        {
+            Id = loan.Id,
+            DeliveryDate = DateTime.Today,
+        };
+
+        return View(model); 
+    }
+
+    /// <summary>
+    /// Handles the delivery of a loan based on the provided model, updating the delivery date and redirecting to the index view.
+    /// </summary>
+    /// <param name="model"></param>
+    /// <returns></returns>
+    [HttpPost]
+    public async Task<IActionResult> Deliver(DeliveryViewModel model)
+    {
+        if (ModelState.IsValid)
+        {
+            await _loanRepository.DeliverLoan(model);
+            return RedirectToAction("Index");
+        }
+
+       return View();
     }
 }

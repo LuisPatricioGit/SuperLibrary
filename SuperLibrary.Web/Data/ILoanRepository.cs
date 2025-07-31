@@ -18,4 +18,8 @@ public interface ILoanRepository : IGenericRepository<Loan>
     Task DeleteLoanDetailTempAsync(int id);
 
     Task<bool> ConfirmLoanAsync(string userName);
+
+    Task DeliverLoan(DeliveryViewModel model);
+
+    Task<Loan> GetLoanAsync(int id);
 }

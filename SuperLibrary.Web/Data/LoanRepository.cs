@@ -125,6 +125,25 @@ public class LoanRepository : GenericRepository<Loan>, ILoanRepository
     }
 
     /// <summary>
+    /// Updates the Delivery Date of a Loan based on the provided model.
+    /// </summary>
+    /// <param name="model"></param>
+    /// <returns></returns>
+    public async Task DeliverLoan(DeliveryViewModel model)
+    {
+        var loan = await _context.Loans.FindAsync(model.Id);
+
+        if (loan == null || loan.WasDeleted)
+        {
+            return;
+        }
+
+        loan.DeliveryDate = model.DeliveryDate;
+        _context.Loans.Update(loan);
+        await _context.SaveChangesAsync();
+    }
+
+    /// <summary>
     /// Returns all LoanDetailTemps for a User.
     /// </summary>
     /// <param name="userName"></param>
@@ -170,6 +189,11 @@ public class LoanRepository : GenericRepository<Loan>, ILoanRepository
             .ThenInclude(li => li.Book)
             .Where(l => l.User == user && !l.WasDeleted)
             .OrderByDescending(l => l.LoanDate);
+    }
+
+    public async Task<Loan> GetLoanAsync(int id)
+    {
+        return await _context.Loans.FindAsync(id);
     }
 
     /// <summary>
