@@ -1,4 +1,6 @@
-﻿using System.Threading.Tasks;
+﻿using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
 using SuperLibrary.Web.Data.Entities;
 using SuperLibrary.Web.Models;
@@ -131,5 +133,14 @@ public class UserHelper : IUserHelper
     public async Task<IdentityResult> UpdateUserAsync(User user)
     {
         return await _userManager.UpdateAsync(user);
+    }
+
+    /// <summary>
+    /// Retrieves all users in the system.
+    /// </summary>
+    /// <returns>A list of users.</returns>
+    public async Task<List<User>> GetAllUsersAsync()
+    {
+        return _userManager.Users.ToList();
     }
 }

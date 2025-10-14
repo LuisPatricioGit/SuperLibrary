@@ -32,4 +32,6 @@ public class User : IdentityUser
             return $"https://localhost:44353{ImageUrl.Substring(1)}";
         }
     }
+
+    public bool IsConfirmed { get; internal set; }
 }

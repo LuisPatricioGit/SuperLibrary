@@ -79,7 +79,7 @@ public class SeedDb
                 PhoneNumber = phoneNumber,
             };
 
-            var result = await _userHelper.AddUserAsync(user, "123456");
+            var result = await _userHelper.AddUserAsync(user, "Obv!ouslyF@k3");
 
             if (result != IdentityResult.Success)
             {

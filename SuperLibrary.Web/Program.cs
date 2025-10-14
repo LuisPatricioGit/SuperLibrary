@@ -36,7 +36,7 @@ public class Program
 
         builder.Services.AddDbContext<DataContext>(o =>
         {
-            o.UseSqlServer(builder.Configuration.GetConnectionString("OnlineConnection"));
+            o.UseSqlServer(builder.Configuration.GetConnectionString("LocalConnection"));
         });
 
         // Seeder

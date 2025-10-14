@@ -35,6 +35,18 @@ public class DataContext : IdentityDbContext<User>
             fk.DeleteBehavior = DeleteBehavior.Restrict;
         }
 
+        // Configure LoanDetail -> Book relationship
+        modelbuilder.Entity<LoanDetail>()
+            .HasOne(ld => ld.Book)
+            .WithMany()
+            .OnDelete(DeleteBehavior.Restrict);
+
+        // Configure LoanDetailTemp -> Book relationship
+        modelbuilder.Entity<LoanDetailTemp>()
+            .HasOne(ldt => ldt.Book)
+            .WithMany()
+            .OnDelete(DeleteBehavior.Restrict);
+
         base.OnModelCreating(modelbuilder);
     }
 }

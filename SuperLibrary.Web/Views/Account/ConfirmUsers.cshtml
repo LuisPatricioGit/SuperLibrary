@@ -1,0 +1,36 @@
+﻿@model IEnumerable<SuperLibrary.Web.Models.UserViewModel>
+@{
+    ViewData["Title"] = "Confirm Users";
+}
+
+<h1>Confirm Users</h1>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>@Html.DisplayNameFor(model => model.First().Username)</th>
+            <th>@Html.DisplayNameFor(model => model.First().Email)</th>
+            <th>@Html.DisplayNameFor(model => model.First().FirstName)</th>
+            <th>@Html.DisplayNameFor(model => model.First().LastName)</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+    @foreach (var user in Model)
+    {
+        <tr>
+            <td>@user.Username</td>
+            <td>@user.Email</td>
+            <td>@user.FirstName</td>
+            <td>@user.LastName</td>
+            <td>
+                <form asp-action="ConfirmUser" asp-controller="Account" method="post">
+                    <input type="hidden" name="id" value="@user.Username" />
+                    <button type="submit" class="btn btn-success btn-sm">Confirm</button>
+                </form>
+            </td>
+        </tr>
+    }
+    </tbody>
+</table>
+
