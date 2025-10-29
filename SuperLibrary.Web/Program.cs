@@ -1,3 +1,4 @@
+using System.Text;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -6,6 +7,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.IdentityModel.Tokens;
 using SuperLibrary.Web.Data;
 using SuperLibrary.Web.Data.Entities;
 using SuperLibrary.Web.Helper;
@@ -25,6 +27,8 @@ public class Program
         builder.Services.AddIdentity<User, IdentityRole>(cfg =>
         {
             // Security settings
+            cfg.Tokens.AuthenticatorTokenProvider = TokenOptions.DefaultAuthenticatorProvider;
+            cfg.SignIn.RequireConfirmedEmail = true;
             cfg.User.RequireUniqueEmail = true;
             cfg.Password.RequireDigit = true;
             cfg.Password.RequiredUniqueChars = 1;
@@ -32,7 +36,22 @@ public class Program
             cfg.Password.RequireUppercase = true;
             cfg.Password.RequireNonAlphanumeric = true;
             cfg.Password.RequiredLength = 6;
-        }).AddEntityFrameworkStores<DataContext>();
+        })
+                 .AddDefaultTokenProviders()
+                .AddEntityFrameworkStores<DataContext>();
+
+        builder.Services.AddAuthentication()
+            .AddCookie()
+            .AddJwtBearer(cfg =>
+            {
+                cfg.TokenValidationParameters = new TokenValidationParameters
+                {
+                    ValidIssuer = builder.Configuration["Tokens:Issuer"],
+                    ValidAudience = builder.Configuration["Tokens:Audience"],
+                    IssuerSigningKey = new SymmetricSecurityKey(
+                        Encoding.UTF8.GetBytes(builder.Configuration["Tokens:Key"]))
+                };
+            });
 
         builder.Services.AddDbContext<DataContext>(o =>
         {
@@ -46,6 +65,7 @@ public class Program
         builder.Services.AddScoped<IUserHelper, UserHelper>();
         builder.Services.AddScoped<IConverterHelper, ConverterHelper>();
         builder.Services.AddScoped<IBlobHelper, BlobHelper>();
+        builder.Services.AddScoped<IMailHelper, MailHelper>();
 
         // Repositories
         builder.Services.AddScoped<IBookRepository, BookRepository>();

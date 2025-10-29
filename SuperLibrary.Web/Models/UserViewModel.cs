@@ -22,7 +22,6 @@ public class UserViewModel
     [Display(Name = "Last Name")]
     public string LastName { get; set; }
 
-    [Required]
     [DataType(DataType.PhoneNumber)]
     [Display(Name = "Phone Number")]
     public string PhoneNumber { get; set; }

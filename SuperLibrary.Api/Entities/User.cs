@@ -1,5 +1,4 @@
-﻿using System;
-using System.ComponentModel.DataAnnotations;
+﻿ using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Identity;
 
 namespace SuperLibrary.Web.Data.Entities;
@@ -12,9 +11,6 @@ public class User : IdentityUser
     [MaxLength(25)]
     public string LastName { get; set; }
 
-    [Display(Name = "Image")]
-    public Guid ImageId { get; set; }
-
     [Display(Name = "Full Name")]
     public string FullName => $"{FirstName} {LastName}";
 
@@ -24,10 +20,18 @@ public class User : IdentityUser
     [Display(Name = "Image")]
     public string ImageUrl { get; set; }
 
-    public string ImageFullPath => ImageId == Guid.Empty
-            ? $"https://superlibrary-d7cmb3geg9d8dab7.westeurope-01.azurewebsites.net/images/noimage.png"
-            : $"https://superlibrary.blob.core.windows.net/users/{ImageId}";
-    // $"https://localhost:44353/images/noimage.png" // Local version
+    public string ImageFullPath
+    {
+        get
+        {
+            if (string.IsNullOrEmpty(ImageUrl))
+            {
+                return null;
+            }
 
-    public bool MustChangePassword { get; set; }
+            return $"https://localhost:44353{ImageUrl.Substring(1)}";
+        }
+    }
+
+    public bool IsConfirmed { get; internal set; }
 }

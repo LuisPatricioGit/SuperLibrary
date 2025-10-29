@@ -12,8 +12,7 @@ public class ChangeUserViewModel
     [Display(Name = "Last Name")]
     public string LastName { get; set; }
 
-    [Required]
-    [DataType(DataType.PhoneNumber)]
+    [MaxLength(20, ErrorMessage = "The field {0} only can contain {1} characters lenght.")]
     public string PhoneNumber { get; set; }
 
 }

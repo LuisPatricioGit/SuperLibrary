@@ -1,0 +1,6 @@
+@SuperLibrary.Api_HostAddress = http://localhost:5133
+
+GET {{SuperLibrary.Api_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

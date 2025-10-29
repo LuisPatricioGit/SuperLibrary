@@ -29,7 +29,7 @@ public class RegisterNewUserViewModel
     [Compare("Password")]
     public string Confirm { get; set; }
 
-    [Required]
+    [MaxLength(20, ErrorMessage = "The field {0} only can contain {1} characters lenght.")]
     [DataType(DataType.PhoneNumber)]
     public string PhoneNumber { get; set; }
 }

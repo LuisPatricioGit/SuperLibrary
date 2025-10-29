@@ -1,0 +1,30 @@
+﻿@model List<SuperLibrary.Web.Models.UserViewModel>
+
+<h2>Manage Users</h2>
+<table class="table">
+    <thead>
+        <tr>
+            <th>Username</th>
+            <th>Email</th>
+            <th>Name</th>
+            <th>Phone</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+    @foreach (var user in Model)
+    {
+        <tr>
+            <td>@user.Username</td>
+            <td>@user.Email</td>
+            <td>@user.FirstName @user.LastName</td>
+            <td>@user.PhoneNumber</td>
+            <td>
+                <a asp-action="EditEmployee" asp-route-id="@user.Username" class="btn btn-sm btn-primary">Edit</a>
+                <a asp-action="DeleteUser" asp-route-username="@user.Username" class="btn btn-sm btn-danger" onclick="return confirm('Are you sure?');">Delete</a>
+                <a asp-action="ConfirmUser" asp-route-id="@user.Username" class="btn btn-sm btn-success">Confirm</a>
+            </td>
+        </tr>
+    }
+    </tbody>
+</table>

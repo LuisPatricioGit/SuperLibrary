@@ -1,9 +1,15 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
+using System.Security.Claims;
+using System.Text;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Configuration;
+using Microsoft.IdentityModel.Tokens;
 using SuperLibrary.Web.Data.Entities;
 using SuperLibrary.Web.Helper;
 using SuperLibrary.Web.Models;
@@ -13,10 +19,14 @@ namespace SuperLibrary.Web.Controllers;
 public class AccountController : Controller
 {
     private readonly IUserHelper _userHelper;
+    private readonly IMailHelper _mailHelper;
+    private readonly IConfiguration _configuration; 
 
-    public AccountController(IUserHelper userHelper)
+    public AccountController(IUserHelper userHelper, IMailHelper mailHelper, IConfiguration configuration)
     {
         _userHelper = userHelper;
+        _mailHelper = mailHelper;
+        _configuration = configuration;
     }
 
     /// <summary>
@@ -42,9 +52,21 @@ public class AccountController : Controller
     {
         if (ModelState.IsValid)
         {
+            var user = await _userHelper.GetUserByNameAsync(model.Username);
+            if (user != null && !user.EmailConfirmed)
+            {
+                ModelState.AddModelError(string.Empty, "Your account has not been confirmed.");
+                return View(model);
+            }
+
             var result = await _userHelper.LoginAsync(model);
             if (result.Succeeded)
             {
+                if (user.MustChangePassword)
+                {
+                    return RedirectToAction("ChangePassword");
+                }
+
                 if (this.Request.Query.Keys.Contains("ReturnUrl"))
                 {
                     return Redirect(this.Request.Query["ReturnUrl"].First());
@@ -105,27 +127,27 @@ public class AccountController : Controller
                     return View(model);
                 }
 
-                var isInRole = await _userHelper.IsUserInRoleAsync(user, "Reader");
-                if (!isInRole)
+                string myToken = await _userHelper.GenerateEmailConfirmationTokenAsync(user);
+                string tokenLink = Url.Action("ConfirmEmail", "Account", new
+                {
+                    userid = user.Id,
+                    token = myToken
+                }, protocol: HttpContext.Request.Scheme);
+
+                Response response = _mailHelper.SendEmail(model.Username, model.Email, "Email confirmation", $"<h1>Email Confirmation</h1>" +
+                    $"To allow the user, " +
+                    $"plase click in this link:</br></br><a href = \"{tokenLink}\">Confirm Email</a>");
+
+                if (response.IsSuccess)
                 {
                     await _userHelper.AddUserToRoleAsync(user, "Reader");
+                    ViewBag.Message = "The instructions to allow you user has been sent to email";
+
+                    return View(model);
                 }
 
-                var loginViewModel = new LoginViewModel
-                {
-                    Username = model.Username,
-                    Password = model.Password,
-                    RememberMe = false
-                };
-
-                var resultLogin = await _userHelper.LoginAsync(loginViewModel);
-                if (resultLogin.Succeeded)
-                {
-                    return RedirectToAction("Index", "Home");
-                }
-                ModelState.AddModelError(string.Empty, "Failed to login after registration");
+                ModelState.AddModelError(string.Empty, "The user couldn't be logged.");
             }
-            ModelState.AddModelError(string.Empty, "Failed to register!");
         }
         return View(model);
     }
@@ -205,6 +227,8 @@ public class AccountController : Controller
                 var result = await _userHelper.ChangePasswordAsync(user, model.OldPassword, model.NewPassword);
                 if (result.Succeeded)
                 {
+                    user.MustChangePassword = false;
+                    await _userHelper.UpdateUserAsync(user);
                     return this.RedirectToAction("ChangeUser");
                 }
                 else
@@ -217,6 +241,73 @@ public class AccountController : Controller
                 this.ModelState.AddModelError(string.Empty, "User not found");
             }
         }
+        return View(model);
+    }
+
+    public IActionResult RecoverPassword()
+    {
+        return View();
+    }
+
+    [HttpPost]
+    public async Task<IActionResult> RecoverPassword(RecoverPasswordViewModel model)
+    {
+        if (this.ModelState.IsValid)
+        {
+            var user = await _userHelper.GetUserByEmailAsync(model.Email);
+            if (user == null)
+            {
+                ModelState.AddModelError(string.Empty, "The email doesn't correspont to a registered user.");
+                return View(model);
+            }
+
+            var myToken = await _userHelper.GeneratePasswordResetTokenAsync(user);
+
+            var link = this.Url.Action(
+                "ResetPassword",
+                "Account",
+                new { token = myToken }, protocol: HttpContext.Request.Scheme);
+
+            Response response = _mailHelper.SendEmail(model.Email, model.Email, "SuperLibrary Password Reset", $"<h1>SuperLibrary Password Reset</h1>" +
+            $"To reset the password click in this link:</br></br>" +
+            $"<a href = \"{link}\">Reset Password</a>");
+
+            if (response.IsSuccess)
+            {
+                this.ViewBag.Message = "The instructions to recover your password has been sent to email.";
+            }
+
+            return this.View();
+
+        }
+
+        return this.View(model);
+    }
+
+    public IActionResult ResetPassword(string token)
+    {
+        return View();
+    }
+
+
+    [HttpPost]
+    public async Task<IActionResult> ResetPassword(ResetPasswordViewModel model)
+    {
+        var user = await _userHelper.GetUserByEmailAsync(model.Username);
+        if (user != null)
+        {
+            var result = await _userHelper.ResetPasswordAsync(user, model.Token, model.Password);
+            if (result.Succeeded)
+            {
+                this.ViewBag.Message = "Password reset successful.";
+                return View();
+            }
+
+            this.ViewBag.Message = "Error while resetting the password.";
+            return View(model);
+        }
+
+        this.ViewBag.Message = "User not found.";
         return View(model);
     }
 
@@ -284,12 +375,32 @@ public class AccountController : Controller
                 UserName = model.Username,
                 FirstName = model.FirstName,
                 LastName = model.LastName,
-                PhoneNumber = model.PhoneNumber
+                PhoneNumber = model.PhoneNumber,
+                EmailConfirmed = false
             };
             var result = await _userHelper.AddUserAsync(user, model.Password);
             if (result.Succeeded)
             {
                 await _userHelper.AddUserToRoleAsync(user, "Employee");
+
+                string myToken = await _userHelper.GenerateEmailConfirmationTokenAsync(user);
+                string tokenLink = Url.Action("ConfirmEmail", "Account", new
+                {
+                    userid = user.Id,
+                    token = myToken
+                }, protocol: HttpContext.Request.Scheme);
+
+                string subject = "Employee Email Confirmation";
+                string body = $"<h1>Email Confirmation</h1>" +
+                              $"Please click the link to confirm your account:</br></br><a href=\"{tokenLink}\">Confirm Email</a>";
+
+                Response response = _mailHelper.SendEmail(model.Username, model.Email, subject, body);
+
+                if (!response.IsSuccess)
+                {
+                    ModelState.AddModelError("", "Employee created, but email could not be sent.");
+                }
+
                 return RedirectToAction("EmployeeList");
             }
             ModelState.AddModelError("", "Failed to create employee");
@@ -373,9 +484,121 @@ public class AccountController : Controller
     {
         var user = await _userHelper.GetUserByNameAsync(id);
         if (user == null) return NotFound();
-        user.IsConfirmed = true;
+        user.EmailConfirmed = true;
         await _userHelper.UpdateUserAsync(user);
+
         return RedirectToAction("ConfirmUsers");
     }
 
+    /// <summary>
+    /// Displays the user management view, accessible only to Admins.
+    /// </summary>
+    /// <returns></returns>
+    [Authorize(Roles = "Admin")]
+    public async Task<IActionResult> ManageUsers()
+    {
+        var users = await _userHelper.GetAllUsersAsync();
+        var viewModels = users.Select(u => new UserViewModel
+        {
+            Username = u.UserName,
+            Email = u.Email,
+            FirstName = u.FirstName,
+            LastName = u.LastName,
+            PhoneNumber = u.PhoneNumber
+        }).ToList();
+
+        return View(viewModels);
+    }
+
+    /// <summary>
+    /// Deletes a user based on their username, accessible only to Admins.
+    /// </summary>
+    /// <param name="username"></param>
+    /// <returns></returns>
+    [Authorize(Roles = "Admin")]
+    public async Task<IActionResult> DeleteUser(string username)
+    {
+        var user = await _userHelper.GetUserByNameAsync(username);
+        if (user == null) return NotFound();
+        var result = await _userHelper.RemoveUserAsync(user);
+        if (!result.Succeeded)
+        {
+            ModelState.AddModelError("", "Failed to delete user");
+        }
+        return RedirectToAction("ManageUsers");
+    }
+
+    /// <summary>
+    /// Confirms the user's email and activates the account.
+    /// </summary>
+    /// <param name="userid">The ID of the user.</param>
+    /// <param name="token">The confirmation token.</param>
+    /// <returns></returns>
+    public async Task<IActionResult> ConfirmEmail(string userId, string token)
+    {
+        if (string.IsNullOrEmpty(userId) || string.IsNullOrEmpty(token))
+        {
+            return NotFound();
+        }
+
+        var user = await _userHelper.GetUserByIdAsync(userId);
+        if (user == null)
+        {
+            return NotFound();
+        }
+
+        var result = await _userHelper.ConfirmEmailAsync(user, token);
+        if (!result.Succeeded)
+        {
+            return NotFound();
+        }
+
+        return View();
+    }
+
+    /// <summary>
+    /// Generates a JWT token for authenticated users.
+    /// </summary>
+    /// <param name="model"></param>
+    /// <returns></returns>
+    [HttpPost]
+    public async Task<IActionResult> CreateToken([FromBody] LoginViewModel model)
+    {
+        if (this.ModelState.IsValid)
+        {
+            var user = await _userHelper.GetUserByEmailAsync(model.Username);
+            if (user != null)
+            {
+                var result = await _userHelper.ValidatePasswordAsync(
+                    user,
+                    model.Password);
+
+                if (result.Succeeded)
+                {
+                    var claims = new[]
+                    {
+                            new Claim(JwtRegisteredClaimNames.Sub, user.Email),
+                            new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
+                        };
+
+                    var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Tokens:Key"]));
+                    var credentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
+                    var token = new JwtSecurityToken(
+                        _configuration["Tokens:Issuer"],
+                        _configuration["Tokens:Audience"],
+                        claims,
+                        expires: DateTime.UtcNow.AddDays(15),
+                        signingCredentials: credentials);
+                    var results = new
+                    {
+                        token = new JwtSecurityTokenHandler().WriteToken(token),
+                        expiration = token.ValidTo
+                    };
+
+                    return this.Created(string.Empty, results);
+                }
+            }
+        }
+        return BadRequest();
+    }
 }

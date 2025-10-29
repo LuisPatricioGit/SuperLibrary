@@ -9,10 +9,9 @@ namespace SuperLibrary.Web.Helper;
 
 public class UserHelper : IUserHelper
 {
-    private readonly UserManager<User> _userManager;
-    private readonly SignInManager<User> _signInManager;
     private readonly RoleManager<IdentityRole> _roleManager;
-
+    private readonly SignInManager<User> _signInManager;
+    private readonly UserManager<User> _userManager;
     public UserHelper(UserManager<User> userManager, SignInManager<User> signInManager, RoleManager<IdentityRole> roleManager)
     {
         _userManager = userManager;
@@ -64,11 +63,52 @@ public class UserHelper : IUserHelper
         var roleExists = await _roleManager.RoleExistsAsync(roleName);
         if (!roleExists)
         {
-            await _roleManager.CreateAsync(new IdentityRole 
-            { 
+            await _roleManager.CreateAsync(new IdentityRole
+            {
                 Name = roleName
             });
         }
+    }
+
+    /// <summary>
+    /// Confirms a user's email using the provided token.
+    /// </summary>
+    /// <param name="user"></param>
+    /// <param name="token"></param>
+    /// <returns></returns>
+    public async Task<IdentityResult> ConfirmEmailAsync(User user, string token)
+    {
+        return await _userManager.ConfirmEmailAsync(user, token);
+    }
+
+    /// <summary>
+    /// Generates an email confirmation token for the specified user.
+    /// </summary>
+    /// <param name="user"></param>
+    /// <returns></returns>
+    public async Task<string> GenerateEmailConfirmationTokenAsync(User user)
+    {
+        return await _userManager.GenerateEmailConfirmationTokenAsync(user);
+    }
+
+    /// <summary>
+    /// Generates a password reset token for the specified user.
+    /// </summary>
+    /// <param name="user"></param>
+    /// <returns></returns>
+    /// <exception cref="System.NotImplementedException"></exception>
+    public async Task<string> GeneratePasswordResetTokenAsync(User user)
+    {
+        return await _userManager.GeneratePasswordResetTokenAsync(user);
+    }
+
+    /// <summary>
+    /// Retrieves all users in the system.
+    /// </summary>
+    /// <returns>A list of users.</returns>
+    public async Task<List<User>> GetAllUsersAsync()
+    {
+        return _userManager.Users.ToList();
     }
 
     /// <summary>
@@ -79,6 +119,17 @@ public class UserHelper : IUserHelper
     public async Task<User> GetUserByEmailAsync(string email)
     {
         return await _userManager.FindByEmailAsync(email);
+    }
+
+    /// <summary>
+    /// Retrieves a user by their unique identifier.
+    /// </summary>
+    /// <param name="userId"></param>
+    /// <returns></returns>
+    /// <exception cref="System.NotImplementedException"></exception>
+    public async Task<User> GetUserByIdAsync(string userId)
+    {
+        return await _userManager.FindByIdAsync(userId);
     }
 
     /// <summary>
@@ -113,7 +164,7 @@ public class UserHelper : IUserHelper
             model.Username,
             model.Password,
             model.RememberMe,
-            false); 
+            false);
     }
 
     /// <summary>
@@ -123,6 +174,29 @@ public class UserHelper : IUserHelper
     public async Task LogoutAsync()
     {
         await _signInManager.SignOutAsync();
+    }
+
+    /// <summary>
+    /// Removes a user from the system.
+    /// </summary>
+    /// <param name="user"></param>
+    /// <returns></returns>
+    public Task<IdentityResult> RemoveUserAsync(User user)
+    {
+        return _userManager.DeleteAsync(user);
+    }
+
+    /// <summary>
+    /// Resets a user's password using the provided token.
+    /// </summary>
+    /// <param name="user"></param>
+    /// <param name="token"></param>
+    /// <param name="password"></param>
+    /// <returns></returns>
+    /// <exception cref="System.NotImplementedException"></exception>
+    public async Task<IdentityResult> ResetPasswordAsync(User user, string token, string password)
+    {
+        return await _userManager.ResetPasswordAsync(user, token, password);
     }
 
     /// <summary>
@@ -136,11 +210,13 @@ public class UserHelper : IUserHelper
     }
 
     /// <summary>
-    /// Retrieves all users in the system.
+    /// Validates a user's password.
     /// </summary>
-    /// <returns>A list of users.</returns>
-    public async Task<List<User>> GetAllUsersAsync()
+    /// <param name="user"></param>
+    /// <param name="password"></param>
+    /// <returns></returns>
+    public Task<SignInResult> ValidatePasswordAsync(User user, string password)
     {
-        return _userManager.Users.ToList();
+        return _signInManager.CheckPasswordSignInAsync(user, password, false);
     }
 }
