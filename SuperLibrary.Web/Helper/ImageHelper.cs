@@ -1,27 +1,26 @@
 ﻿using System.IO;
 using System;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
 
-namespace SuperLibrary.Web.Helpers;
+namespace SuperLibrary.Web.Helper;
 
 public class ImageHelper : IImageHelper
 {
-    public async Task<string> UploadImageAsync(IFormFile imageFile, string folder)
+    public async Task<string> UploadImageAsync(System.IO.Stream imageStream, string fileName, string folder)
     {
         string guid = Guid.NewGuid().ToString();
-        string file = $"{guid}.jpg";
-
-        string path = Path.Combine(
-            Directory.GetCurrentDirectory(),
-            $"wwwroot\\images\\{folder}",
-            file);
-
+        string ext = Path.GetExtension(fileName);
+        string file = $"{guid}{ext}";
+        string directory = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "images", folder);
+        if (!Directory.Exists(directory))
+        {
+            Directory.CreateDirectory(directory);
+        }
+        string path = Path.Combine(directory, file);
         using (FileStream stream = new FileStream(path, FileMode.Create))
         {
-            await imageFile.CopyToAsync(stream);
+            await imageStream.CopyToAsync(stream);
         }
-
-        return $"~/images/{folder}/{file}";
+        return $"/images/{folder}/{file}";
     }
 }

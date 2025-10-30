@@ -66,6 +66,7 @@ public class Program
         builder.Services.AddScoped<IConverterHelper, ConverterHelper>();
         builder.Services.AddScoped<IBlobHelper, BlobHelper>();
         builder.Services.AddScoped<IMailHelper, MailHelper>();
+        builder.Services.AddScoped<IImageHelper, ImageHelper>();
 
         // Repositories
         builder.Services.AddScoped<IBookRepository, BookRepository>();

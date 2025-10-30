@@ -6,6 +6,7 @@ using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
@@ -20,13 +21,15 @@ public class AccountController : Controller
 {
     private readonly IUserHelper _userHelper;
     private readonly IMailHelper _mailHelper;
-    private readonly IConfiguration _configuration; 
+    private readonly IConfiguration _configuration;
+    private readonly IImageHelper _imageHelper;
 
-    public AccountController(IUserHelper userHelper, IMailHelper mailHelper, IConfiguration configuration)
+    public AccountController(IUserHelper userHelper, IMailHelper mailHelper, IConfiguration configuration, IImageHelper imageHelper)
     {
         _userHelper = userHelper;
         _mailHelper = mailHelper;
         _configuration = configuration;
+        _imageHelper = imageHelper;
     }
 
     /// <summary>
@@ -317,7 +320,8 @@ public class AccountController : Controller
     /// <returns></returns>
     public IActionResult AccessDenied()
     {
-        return View();
+        // Explicitly specify the new path for the moved view
+        return View("~/Views/Errors/AccessDenied.cshtml");
     }
 
     /// <summary>
@@ -600,5 +604,77 @@ public class AccountController : Controller
             }
         }
         return BadRequest();
+    }
+
+    /// <summary>
+    /// Displays the profile view for the authenticated user.
+    /// </summary>
+    /// <returns></returns>
+    [Authorize]
+    public async Task<IActionResult> Profile()
+    {
+        var user = await _userHelper.GetUserByNameAsync(User.Identity.Name);
+        if (user == null) return RedirectToAction("Login");
+        var model = new UserViewModel
+        {
+            Username = user.UserName,
+            Email = user.Email,
+            FirstName = user.FirstName,
+            LastName = user.LastName,
+            PhoneNumber = user.PhoneNumber
+        };
+        ViewBag.ProfileImageUrl = string.IsNullOrEmpty(user.ImageUrl) ? "/images/noimage.png" : user.ImageUrl;
+        ViewBag.StatusMessage = TempData["StatusMessage"];
+        return View(model);
+    }
+
+    /// <summary>
+    /// Handles the profile update process for the authenticated user.
+    /// </summary>
+    /// <param name="model"></param>
+    /// <returns></returns>
+    [HttpPost]
+    [Authorize]
+    public async Task<IActionResult> UpdateProfile(UserViewModel model)
+    {
+        if (!ModelState.IsValid)
+        {
+            TempData["StatusMessage"] = "Invalid data.";
+            return RedirectToAction("Profile");
+        }
+        var user = await _userHelper.GetUserByEmailAsync(User.Identity.Name);
+        if (user == null) return RedirectToAction("Login");
+        user.FirstName = model.FirstName;
+        user.LastName = model.LastName;
+        user.Email = model.Email;
+        user.PhoneNumber = model.PhoneNumber;
+        var result = await _userHelper.UpdateUserAsync(user);
+        TempData["StatusMessage"] = result.Succeeded ? "Profile updated successfully." : "Failed to update profile.";
+        return RedirectToAction("Profile");
+    }
+
+    /// <summary>
+    /// Handles the profile picture change process for the authenticated user.
+    /// </summary>
+    /// <param name="profilePicture"></param>
+    /// <returns></returns>
+    [HttpPost]
+    [Authorize]
+    public async Task<IActionResult> ChangeProfilePicture(IFormFile profilePicture)
+    {
+        var user = await _userHelper.GetUserByNameAsync(User.Identity.Name);
+        if (user == null) return RedirectToAction("Login");
+        if (profilePicture != null && profilePicture.Length > 0)
+        {
+            var imageUrl = await _imageHelper.UploadImageAsync(profilePicture.OpenReadStream(), profilePicture.FileName, "users");
+            user.ImageUrl = imageUrl;
+            await _userHelper.UpdateUserAsync(user);
+            TempData["StatusMessage"] = "Profile picture updated.";
+        }
+        else
+        {
+            TempData["StatusMessage"] = "No image selected.";
+        }
+        return RedirectToAction("Profile");
     }
 }

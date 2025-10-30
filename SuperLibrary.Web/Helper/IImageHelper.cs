@@ -1,9 +1,9 @@
 ﻿using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 
-namespace SuperLibrary.Web.Helpers;
+namespace SuperLibrary.Web.Helper;
 
 public interface IImageHelper
 {
-    Task<string> UploadImageAsync(IFormFile imageFile, string folder);
+    Task<string> UploadImageAsync(System.IO.Stream imageStream, string fileName, string folder);
 }

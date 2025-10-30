@@ -2,16 +2,20 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using SuperLibrary.Web.Models;
+using SuperLibrary.Web.Data;
+using System.Linq;
 
 namespace SuperLibrary.Web.Controllers;
 
 public class HomeController : Controller
 {
     private readonly ILogger<HomeController> _logger;
+    private readonly IBookRepository _bookRepository;
 
-    public HomeController(ILogger<HomeController> logger)
+    public HomeController(ILogger<HomeController> logger, IBookRepository bookRepository)
     {
         _logger = logger;
+        _bookRepository = bookRepository;
     }
 
     /// <summary>
@@ -20,7 +24,8 @@ public class HomeController : Controller
     /// <returns></returns>
     public IActionResult Index()
     {
-        return View();
+        var books = _bookRepository.GetAll().ToList();
+        return View(books);
     }
 
     /// <summary>
