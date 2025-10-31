@@ -1,0 +1,63 @@
+@{
+    ViewData["Title"] = "Loans API Documentation";
+}
+<!-- Modern Swagger-like API doc with Bootstrap -->
+<div class="container my-4">
+    <h1 class="mb-3">Loans API</h1>
+    <p class="lead">This API provides access to loan data.</p>
+
+    <div class="card mb-4 shadow-sm">
+        <div class="card-body">
+            <span class="badge bg-primary me-2">GET</span>
+            <span class="h5">/api/loans</span>
+            <p class="mt-2 mb-1">Returns a list of all loans, including user and loan item details.</p>
+            <button class="btn btn-link p-0" type="button" data-bs-toggle="collapse" data-bs-target="#params" aria-expanded="false" aria-controls="params">
+                Parameters
+            </button>
+            <div class="collapse show" id="params">
+                <table class="table table-bordered table-sm mt-2 mb-0">
+                    <thead class="table-light">
+                        <tr><th>Name</th><th>In</th><th>Type</th><th>Required</th><th>Description</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr><td colspan="5" class="text-muted">No parameters</td></tr>
+                    </tbody>
+                </table>
+            </div>
+            <button class="btn btn-link p-0 mt-2" type="button" data-bs-toggle="collapse" data-bs-target="#response" aria-expanded="true" aria-controls="response">
+                Response 200
+            </button>
+            <div class="collapse show" id="response">
+                <table class="table table-bordered table-sm mt-2">
+                    <thead class="table-light">
+                        <tr><th>Field</th><th>Type</th><th>Description</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>id</td><td>integer</td><td>Loan ID</td></tr>
+                        <tr><td>userName</td><td>string</td><td>User name</td></tr>
+                        <tr><td>loanDate</td><td>string (date)</td><td>Loan date</td></tr>
+                        <tr><td>dueDate</td><td>string (date)</td><td>Due date</td></tr>
+                        <tr><td>deliveryDate</td><td>string (date)</td><td>Delivery date</td></tr>
+                        <tr><td>loanItems</td><td>array</td><td>List of loan items</td></tr>
+                    </tbody>
+                </table>
+                <div class="mb-2"><strong>Example Value</strong></div>
+                <pre class="bg-light p-2 rounded border"><code>{
+  "id": 1,
+  "userName": "user1",
+  "loanDate": "2023-01-01T00:00:00",
+  "dueDate": "2023-01-15T00:00:00",
+  "deliveryDate": "2023-01-10T00:00:00",
+  "loanItems": [
+    {
+      "bookId": 1,
+      "bookTitle": "Book Title",
+      "quantity": 1
+    }
+  ]
+}</code></pre>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Ensure Bootstrap JS is loaded for collapse functionality -->

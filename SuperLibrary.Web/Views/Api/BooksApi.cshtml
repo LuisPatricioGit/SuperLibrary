@@ -1,0 +1,65 @@
+@{
+    ViewData["Title"] = "Books API Documentation";
+}
+<!-- Modern Swagger-like API doc with Bootstrap -->
+<div class="container my-4">
+    <h1 class="mb-3">Books API</h1>
+    <p class="lead">This API provides access to book data.</p>
+
+    <div class="card mb-4 shadow-sm">
+        <div class="card-body">
+            <span class="badge bg-primary me-2">GET</span>
+            <span class="h5">/api/books</span>
+            <p class="mt-2 mb-1">Returns a list of all books, including user info if available.</p>
+            <button class="btn btn-link p-0" type="button" data-bs-toggle="collapse" data-bs-target="#params" aria-expanded="false" aria-controls="params">
+                Parameters
+            </button>
+            <div class="collapse show" id="params">
+                <table class="table table-bordered table-sm mt-2 mb-0">
+                    <thead class="table-light">
+                        <tr><th>Name</th><th>In</th><th>Type</th><th>Required</th><th>Description</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr><td colspan="5" class="text-muted">No parameters</td></tr>
+                    </tbody>
+                </table>
+            </div>
+            <button class="btn btn-link p-0 mt-2" type="button" data-bs-toggle="collapse" data-bs-target="#response" aria-expanded="true" aria-controls="response">
+                Response 200
+            </button>
+            <div class="collapse show" id="response">
+                <table class="table table-bordered table-sm mt-2">
+                    <thead class="table-light">
+                        <tr><th>Field</th><th>Type</th><th>Description</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>id</td><td>integer</td><td>Book ID</td></tr>
+                        <tr><td>title</td><td>string</td><td>Book title</td></tr>
+                        <tr><td>author</td><td>string</td><td>Author name</td></tr>
+                        <tr><td>publisher</td><td>string</td><td>Publisher name</td></tr>
+                        <tr><td>releaseYear</td><td>string (date)</td><td>Release year</td></tr>
+                        <tr><td>copies</td><td>integer</td><td>Number of copies</td></tr>
+                        <tr><td>genreId</td><td>integer</td><td>Genre ID</td></tr>
+                        <tr><td>imageFullPath</td><td>string</td><td>Image URL</td></tr>
+                        <tr><td>isAvailable</td><td>boolean</td><td>Availability</td></tr>
+                        <tr><td>userName</td><td>string</td><td>Current user (if any)</td></tr>
+                    </tbody>
+                </table>
+                <div class="mb-2"><strong>Example Value</strong></div>
+                <pre class="bg-light p-2 rounded border"><code>{
+  "id": 1,
+  "title": "Book Title",
+  "author": "Author Name",
+  "publisher": "Publisher Name",
+  "releaseYear": "2023-01-01T00:00:00",
+  "copies": 5,
+  "genreId": 2,
+  "imageFullPath": "/images/book.jpg",
+  "isAvailable": true,
+  "userName": "user1"
+}</code></pre>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Ensure Bootstrap JS is loaded for collapse functionality -->

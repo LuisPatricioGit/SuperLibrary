@@ -5,11 +5,11 @@
 
 <h1>Manage Users</h1>
 
-<a asp-action="ManageUsers" asp-controller="Account" class="btn btn-secondary mb-3"> Return</a>
+<a asp-action="ManageUsers" asp-controller="Account" class="btn btn-secondary mb-3"><i class="fa-solid fa-arrow-left me-1"></i> Return</a>
 
 @if (User.IsInRole("Admin"))
 {
-    <a asp-action="AddUserToRole" asp-controller="Account" asp-route-role="@ViewBag.Role" class="btn btn-success mb-3 ms-2">Add User</a>
+    <a asp-action="AddUserToRole" asp-controller="Account" asp-route-role="@ViewBag.Role" class="btn btn-success mb-3 ms-2"><i class="fa-solid fa-user-plus me-1"></i> Add User</a>
 }
 
 @if (!Model.Any())
@@ -44,17 +44,17 @@ else
                 @if (User.IsInRole("Admin"))
                 {
                     <td>
-                        <a asp-action="UserDetails" asp-controller="Account" asp-route-username="@user.Username" asp-route-role="@ViewBag.Role" class="btn btn-info btn-sm">View</a>
-                        <a asp-action="EditUserInRole" asp-controller="Account" asp-route-username="@user.Username" asp-route-role="@ViewBag.Role" class="btn btn-primary btn-sm">Edit</a>
+                        <a asp-action="UserDetails" asp-controller="Account" asp-route-username="@user.Username" asp-route-role="@ViewBag.Role" class="btn btn-info btn-sm"><i class="fa-solid fa-eye me-1"></i> View</a>
+                        <a asp-action="EditUserInRole" asp-controller="Account" asp-route-username="@user.Username" asp-route-role="@ViewBag.Role" class="btn btn-primary btn-sm"><i class="fa-solid fa-pen me-1"></i> Edit</a>
                         <form asp-action="RemoveUserFromRole" asp-controller="Account" method="post" style="display:inline">
                             <input type="hidden" name="username" value="@user.Username" />
                             <input type="hidden" name="role" value="@ViewBag.Role" />
-                            <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure you want to remove this user?');">Remove</button>
+                            <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure you want to remove this user?');"><i class="fa-solid fa-user-minus me-1"></i> Remove</button>
                         </form>
                         @if (user.IsAdminConfirmed)
                         {
                             <span class="text-success">
-                                <i class="bi bi-check-circle-fill"></i> Confirmed
+                                <i class="fa-solid fa-circle-check"></i> Confirmed
                             </span>
                         }
                         else
@@ -62,7 +62,7 @@ else
                             <form asp-action="ConfirmUserInRole" asp-controller="Account" method="post" style="display:inline">
                                 <input type="hidden" name="username" value="@user.Username" />
                                 <input type="hidden" name="role" value="@ViewBag.Role" />
-                                <button type="submit" class="btn btn-success btn-sm">Confirm</button>
+                                <button type="submit" class="btn btn-success btn-sm"><i class="fa-solid fa-check me-1"></i> Confirm</button>
                             </form>
                         }
                     </td>

@@ -30,7 +30,7 @@
 <div class="mt-3">
     @if (User.IsInRole("Admin"))
     {
-        <a asp-action="EditUserInRole" asp-controller="Account" asp-route-username="@Model.Username" asp-route-role="@ViewBag.Role" class="btn btn-outline-warning"> Edit</a>
+        <a asp-action="EditUserInRole" asp-controller="Account" asp-route-username="@Model.Username" asp-route-role="@ViewBag.Role" class="btn btn-outline-warning"><i class="fa-solid fa-pen me-1"></i> Edit</a>
     }
-    <a asp-action="UsersByRole" asp-controller="Account" asp-route-role="@ViewBag.Role" class="btn btn-outline-secondary"> Return</a>
+    <a asp-action="UsersByRole" asp-controller="Account" asp-route-role="@ViewBag.Role" class="btn btn-outline-secondary"><i class="fa-solid fa-arrow-left me-1"></i> Return</a>
 </div>

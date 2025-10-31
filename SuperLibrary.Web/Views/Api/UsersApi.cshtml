@@ -1,0 +1,59 @@
+@{
+    ViewData["Title"] = "Users API Documentation";
+}
+<!-- Modern Swagger-like API doc with Bootstrap -->
+<div class="container my-4">
+    <h1 class="mb-3">Users API</h1>
+    <p class="lead">This API provides access to user data.</p>
+
+    <div class="card mb-4 shadow-sm">
+        <div class="card-body">
+            <span class="badge bg-primary me-2">GET</span>
+            <span class="h5">/api/users</span>
+            <p class="mt-2 mb-1">Returns a list of all users.</p>
+            <button class="btn btn-link p-0" type="button" data-bs-toggle="collapse" data-bs-target="#params" aria-expanded="false" aria-controls="params">
+                Parameters
+            </button>
+            <div class="collapse show" id="params">
+                <table class="table table-bordered table-sm mt-2 mb-0">
+                    <thead class="table-light">
+                        <tr><th>Name</th><th>In</th><th>Type</th><th>Required</th><th>Description</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr><td colspan="5" class="text-muted">No parameters</td></tr>
+                    </tbody>
+                </table>
+            </div>
+            <button class="btn btn-link p-0 mt-2" type="button" data-bs-toggle="collapse" data-bs-target="#response" aria-expanded="true" aria-controls="response">
+                Response 200
+            </button>
+            <div class="collapse show" id="response">
+                <table class="table table-bordered table-sm mt-2">
+                    <thead class="table-light">
+                        <tr><th>Field</th><th>Type</th><th>Description</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>id</td><td>string (guid)</td><td>User ID</td></tr>
+                        <tr><td>userName</td><td>string</td><td>User name</td></tr>
+                        <tr><td>email</td><td>string</td><td>Email address</td></tr>
+                        <tr><td>firstName</td><td>string</td><td>First name</td></tr>
+                        <tr><td>lastName</td><td>string</td><td>Last name</td></tr>
+                        <tr><td>imageUrl</td><td>string</td><td>Profile image URL</td></tr>
+                        <tr><td>isAdminConfirmed</td><td>boolean</td><td>Admin confirmation status</td></tr>
+                    </tbody>
+                </table>
+                <div class="mb-2"><strong>Example Value</strong></div>
+                <pre class="bg-light p-2 rounded border"><code>{
+  "id": "user-guid",
+  "userName": "user1",
+  "email": "user1@email.com",
+  "firstName": "First",
+  "lastName": "Last",
+  "imageUrl": "/images/user.jpg",
+  "isAdminConfirmed": true
+}</code></pre>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Ensure Bootstrap JS is loaded for collapse functionality -->

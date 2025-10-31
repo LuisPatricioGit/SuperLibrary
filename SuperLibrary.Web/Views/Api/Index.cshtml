@@ -1,0 +1,37 @@
+@{
+    ViewData["Title"] = "API Documentation";
+}
+<div class="container my-4">
+    <h1 class="mb-4">API Documentation</h1>
+    <div class="row g-4">
+        <div class="col-md-4">
+            <div class="card shadow-sm h-100">
+                <div class="card-body d-flex flex-column justify-content-between">
+                    <h5 class="card-title mb-2"><i class="bi bi-book me-2"></i>Books API</h5>
+                    <p class="card-text flex-grow-1">Access book data, including availability and user info.</p>
+                    <a asp-controller="Api" asp-action="BooksApi" class="btn btn-primary mt-2">View Books API</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card shadow-sm h-100">
+                <div class="card-body d-flex flex-column justify-content-between">
+                    <h5 class="card-title mb-2"><i class="bi bi-person me-2"></i>Users API</h5>
+                    <p class="card-text flex-grow-1">Access user data and details.</p>
+                    <a asp-controller="Api" asp-action="UsersApi" class="btn btn-primary mt-2">View Users API</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card shadow-sm h-100">
+                <div class="card-body d-flex flex-column justify-content-between">
+                    <h5 class="card-title mb-2"><i class="bi bi-journal-arrow-up me-2"></i>Loans API</h5>
+                    <p class="card-text flex-grow-1">Access loan data, including user and item details.</p>
+                    <a asp-controller="Api" asp-action="LoansApi" class="btn btn-primary mt-2">View Loans API</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="text-muted mt-4">Select an API above to view its documentation.</div>
+</div>
+<!-- Optionally, include Bootstrap Icons CDN in your _Layout.cshtml for icons to show -->

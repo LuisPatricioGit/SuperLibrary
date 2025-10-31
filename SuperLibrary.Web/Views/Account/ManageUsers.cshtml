@@ -2,24 +2,35 @@
     ViewData["Title"] = "Manage Users";
 }
 
-<div class="container" style="height: 60vh;">
-    <h2>Manage User</h2>
-    <div class="row h-100 align-items-center">
+<div class="container my-4">
+    <h1 class="mb-3">Manage Users</h1>
+    <p class="lead">Quickly filter and manage users by role or status.</p>
+    <div class="row g-4 justify-content-center">
         <!-- Select a Role Section -->
         <div class="col-md-6 d-flex flex-column align-items-center">
-            <h3>By Role:</h3>
-            <div class="btn-group-vertical" style="width: 300px;">
-                <a asp-controller="Account" asp-action="UsersByRole" asp-route-role="Reader" class="btn btn-lg btn-primary mb-4" style="height: 80px; font-size: 2rem;"> Reader</a>
-                <a asp-controller="Account" asp-action="UsersByRole" asp-route-role="Employee" class="btn btn-lg btn-success mb-4" style="height: 80px; font-size: 2rem;"> Employee</a>
-                <a asp-controller="Account" asp-action="UsersByRole" asp-route-role="Admin" class="btn btn-lg btn-danger" style="height: 80px; font-size: 2rem;"> Admin</a>
+            <div class="card shadow-sm border-0 w-100" style="max-width: 380px;">
+                <div class="card-body d-flex flex-column align-items-center">
+                    <span class="badge bg-primary mb-2" style="font-size:1rem;">Role</span>
+                    <h3 class="card-title mb-3">By Role</h3>
+                    <div class="btn-group-vertical w-100" style="max-width: 300px;">
+                        <a asp-controller="Account" asp-action="UsersByRole" asp-route-role="Reader" class="btn btn-lg btn-primary mb-4" style="height: 80px; font-size: 2rem;"><i class="fa-solid fa-user me-2"></i> Reader</a>
+                        <a asp-controller="Account" asp-action="UsersByRole" asp-route-role="Employee" class="btn btn-lg btn-success mb-4" style="height: 80px; font-size: 2rem;"><i class="fa-solid fa-user-tie me-2"></i> Employee</a>
+                        <a asp-controller="Account" asp-action="UsersByRole" asp-route-role="Admin" class="btn btn-lg btn-danger" style="height: 80px; font-size: 2rem;"><i class="fa-solid fa-user-shield me-2"></i> Admin</a>
+                    </div>
+                </div>
             </div>
         </div>
         <!-- Select by Status Section -->
         <div class="col-md-6 d-flex flex-column align-items-center">
-            <h3>By Status:</h3>
-            <div class="btn-group-vertical" style="width: 300px;">
-                <a asp-controller="Account" asp-action="UsersByStatus" asp-route-status="Pending" class="btn btn-lg btn-warning mb-4" style="height: 80px; font-size: 2rem;"> Not Confirmed</a>
-                <a asp-controller="Account" asp-action="AllUsers" class="btn btn-lg btn-dark" style="height: 80px; font-size: 2rem;"> All Users</a>
+            <div class="card shadow-sm border-0 w-100" style="max-width: 380px;">
+                <div class="card-body d-flex flex-column align-items-center">
+                    <span class="badge bg-warning text-dark mb-2" style="font-size:1rem;">Status</span>
+                    <h3 class="card-title mb-3">By Status</h3>
+                    <div class="btn-group-vertical w-100" style="max-width: 300px;">
+                        <a asp-controller="Account" asp-action="UsersByStatus" asp-route-status="Pending" class="btn btn-lg btn-warning mb-4" style="height: 80px; font-size: 2rem;"><i class="fa-solid fa-user-clock me-2"></i> Not Confirmed</a>
+                        <a asp-controller="Account" asp-action="AllUsers" class="btn btn-lg btn-dark" style="height: 80px; font-size: 2rem;"><i class="fa-solid fa-users me-2"></i> All Users</a>
+                    </div>
+                </div>
             </div>
         </div>
     </div>

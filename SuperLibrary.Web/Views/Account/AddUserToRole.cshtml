@@ -42,6 +42,10 @@
         <input asp-for="Confirm" type="password" class="form-control" />
         <span asp-validation-for="Confirm" class="text-danger"></span>
     </div>
-    <button type="submit" class="btn btn-success">Add User</button>
-    <a asp-action="UsersByRole" asp-controller="Account" asp-route-role="@ViewBag.Role" class="btn btn-secondary">Cancel</a>
+    <button type="submit" class="btn btn-success">
+        <i class="fa-solid fa-user-plus me-1"></i> Add User
+    </button>
+    <a asp-action="UsersByRole" asp-controller="Account" asp-route-role="@ViewBag.Role" class="btn btn-secondary">
+        <i class="fa-solid fa-xmark me-1"></i> Cancel
+    </a>
 </form>
