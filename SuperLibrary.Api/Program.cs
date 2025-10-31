@@ -44,8 +44,7 @@ builder.Services.AddSwaggerGen(c =>
 
 // Add DbContext (update connection string as needed)
 builder.Services.AddDbContext<DataContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("OnlineConnection") ??
-        "Server=(localdb)\\MSSQLLocalDB;Database=SuperLibrary;Trusted_Connection=True;MultipleActiveResultSets=True"));
+    options.UseSqlServer(builder.Configuration.GetConnectionString("OnlineConnection")));
 
 // Add Identity
 builder.Services.AddIdentity<User, IdentityRole>()
