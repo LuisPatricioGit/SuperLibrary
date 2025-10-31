@@ -1,7 +1,7 @@
-﻿using System;
+using System;
 using System.ComponentModel.DataAnnotations;
 
-namespace SuperLibrary.Web.Data.Entities;
+namespace SuperLibrary.Api.Data.Entities;
 
 public class Book : IEntity
 {
@@ -42,5 +42,4 @@ public class Book : IEntity
     public string ImageFullPath => ImageId == Guid.Empty
            ? $"https://superlibrary-d7cmb3geg9d8dab7.westeurope-01.azurewebsites.net/images/noimage.png"
            : $"https://superlibrary.blob.core.windows.net/books/{ImageId}";
-           // $"https://localhost:44353/images/noimage.png" // Local version
 }

@@ -1,9 +1,9 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 
-namespace SuperLibrary.Web.Data.Entities;
+namespace SuperLibrary.Api.Data.Entities;
 
 public class Loan : IEntity
 {

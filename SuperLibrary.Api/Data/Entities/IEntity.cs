@@ -1,4 +1,4 @@
-﻿namespace SuperLibrary.Web.Data.Entities;
+namespace SuperLibrary.Api.Data.Entities;
 
 public interface IEntity
 {

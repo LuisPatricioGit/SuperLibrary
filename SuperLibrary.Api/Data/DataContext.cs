@@ -1,9 +1,9 @@
-﻿using System.Linq;
+using System.Linq;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
-using SuperLibrary.Api.Entities;
+using SuperLibrary.Api.Data.Entities;
 
-namespace SuperLibrary.Api.Context;
+namespace SuperLibrary.Api.Data;
 
 public class DataContext : IdentityDbContext<User>
 {
@@ -19,10 +19,6 @@ public class DataContext : IdentityDbContext<User>
     {
     }
 
-    /// <summary>
-    /// This method is used to configure the model and its relationships.
-    /// </summary>
-    /// <param name="modelbuilder"></param>
     protected override void OnModelCreating(ModelBuilder modelbuilder)
     {
         var cascadeFKs = modelbuilder.Model
@@ -35,13 +31,11 @@ public class DataContext : IdentityDbContext<User>
             fk.DeleteBehavior = DeleteBehavior.Restrict;
         }
 
-        // Configure LoanDetail -> Book relationship
         modelbuilder.Entity<LoanDetail>()
             .HasOne(ld => ld.Book)
             .WithMany()
             .OnDelete(DeleteBehavior.Restrict);
 
-        // Configure LoanDetailTemp -> Book relationship
         modelbuilder.Entity<LoanDetailTemp>()
             .HasOne(ldt => ldt.Book)
             .WithMany()

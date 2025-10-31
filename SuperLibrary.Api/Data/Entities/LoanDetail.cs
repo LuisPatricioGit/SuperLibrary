@@ -1,8 +1,7 @@
-﻿using System;
+using System;
 using System.ComponentModel.DataAnnotations;
-using Microsoft.VisualBasic;
 
-namespace SuperLibrary.Web.Data.Entities;
+namespace SuperLibrary.Api.Data.Entities;
 
 public class LoanDetail : IEntity
 {
