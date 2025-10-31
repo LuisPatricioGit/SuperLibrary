@@ -61,7 +61,12 @@ public class AccountController : Controller
                 ModelState.AddModelError(string.Empty, "Your account has not been confirmed.");
                 return View(model);
             }
-
+            // Require admin confirmation
+            if (user != null && !user.IsAdminConfirmed)
+            {
+                ModelState.AddModelError(string.Empty, "Your account is pending admin approval.");
+                return View(model);
+            }
             var result = await _userHelper.LoginAsync(model);
             if (result.Succeeded)
             {
@@ -119,9 +124,9 @@ public class AccountController : Controller
                     UserName = model.Username,
                     FirstName = model.FirstName,
                     LastName = model.LastName,
-                    PhoneNumber = model.PhoneNumber
+                    PhoneNumber = model.PhoneNumber,
+                    IsAdminConfirmed = false // Require admin confirmation
                 };
-
 
                 var result = await _userHelper.AddUserAsync(user, model.Password);
                 if (result != IdentityResult.Success)
@@ -163,6 +168,11 @@ public class AccountController : Controller
     public async Task<IActionResult> ChangeUser()
     {
         var user = await _userHelper.GetUserByEmailAsync(this.User.Identity.Name);
+        if (user != null && user.MustChangePassword)
+        {
+            // Force password change before allowing access
+            return RedirectToAction("ChangePassword");
+        }
         var model = new ChangeUserViewModel();
         if (user != null)
         {
@@ -181,9 +191,14 @@ public class AccountController : Controller
     [HttpPost]
     public async Task<IActionResult> ChangeUser(ChangeUserViewModel model)
     {
+        var user = await _userHelper.GetUserByEmailAsync(this.User.Identity.Name);
+        if (user != null && user.MustChangePassword)
+        {
+            // Force password change before allowing access
+            return RedirectToAction("ChangePassword");
+        }
         if (ModelState.IsValid)
         {
-            var user = await _userHelper.GetUserByEmailAsync(this.User.Identity.Name);
             if (user != null)
             {
                 user.FirstName = model.FirstName;
@@ -325,214 +340,6 @@ public class AccountController : Controller
     }
 
     /// <summary>
-    /// Displays a list of employees, accessible only to Admins.
-    /// </summary>
-    /// <returns></returns>
-    [Authorize(Roles = "Admin")]
-    public async Task<IActionResult> EmployeeList()
-    {
-        var allUsers = await _userHelper.GetAllUsersAsync();
-        var employees = new List<UserViewModel>();
-
-        foreach (var user in allUsers)
-        {
-            if (await _userHelper.IsUserInRoleAsync(user, "Employee"))
-            {
-                employees.Add(new UserViewModel
-                {
-                    Username = user.UserName,
-                    Email = user.Email,
-                    FirstName = user.FirstName,
-                    LastName = user.LastName,
-                    PhoneNumber = user.PhoneNumber
-                });
-            }
-        }
-
-        return View(employees);
-    }
-
-    /// <summary>
-    /// Displays the view for creating a new employee.
-    /// </summary>
-    /// <returns></returns>
-    [Authorize(Roles = "Admin")]
-    public IActionResult CreateEmployee()
-    {
-        return View();
-    }
-
-    /// <summary>
-    /// Handles the process of creating a new employee.
-    /// </summary>
-    /// <param name="model"></param>
-    /// <returns></returns>
-    [HttpPost]
-    [Authorize(Roles = "Admin")]
-    public async Task<IActionResult> CreateEmployee(RegisterNewUserViewModel model)
-    {
-        if (ModelState.IsValid)
-        {
-            var user = new User
-            {
-                Email = model.Email,
-                UserName = model.Username,
-                FirstName = model.FirstName,
-                LastName = model.LastName,
-                PhoneNumber = model.PhoneNumber,
-                EmailConfirmed = false
-            };
-            var result = await _userHelper.AddUserAsync(user, model.Password);
-            if (result.Succeeded)
-            {
-                await _userHelper.AddUserToRoleAsync(user, "Employee");
-
-                string myToken = await _userHelper.GenerateEmailConfirmationTokenAsync(user);
-                string tokenLink = Url.Action("ConfirmEmail", "Account", new
-                {
-                    userid = user.Id,
-                    token = myToken
-                }, protocol: HttpContext.Request.Scheme);
-
-                string subject = "Employee Email Confirmation";
-                string body = $"<h1>Email Confirmation</h1>" +
-                              $"Please click the link to confirm your account:</br></br><a href=\"{tokenLink}\">Confirm Email</a>";
-
-                Response response = _mailHelper.SendEmail(model.Username, model.Email, subject, body);
-
-                if (!response.IsSuccess)
-                {
-                    ModelState.AddModelError("", "Employee created, but email could not be sent.");
-                }
-
-                return RedirectToAction("EmployeeList");
-            }
-            ModelState.AddModelError("", "Failed to create employee");
-        }
-        return View(model);
-    }
-
-    /// <summary>
-    /// Displays the view for editing an existing employee's details.
-    /// </summary>
-    /// <param name="id">The ID of the employee to edit.</param>
-    /// <returns></returns>
-    [Authorize(Roles = "Admin")]
-    public async Task<IActionResult> EditEmployee(string id)
-    {
-        var user = await _userHelper.GetUserByNameAsync(id);
-        if (user == null) return NotFound();
-        var model = new UserViewModel
-        {
-            Email = user.Email,
-            Username = user.UserName,
-            FirstName = user.FirstName,
-            LastName = user.LastName,
-            PhoneNumber = user.PhoneNumber
-        };
-        return View(model);
-    }
-
-    /// <summary>
-    /// Handles the process of editing an existing employee's details.
-    /// </summary>
-    /// <param name="model">The model containing the updated employee details.</param>
-    /// <returns></returns>
-    [HttpPost]
-    [Authorize(Roles = "Admin")]
-    public async Task<IActionResult> EditEmployee(UserViewModel model)
-    {
-        if (ModelState.IsValid)
-        {
-            var user = await _userHelper.GetUserByNameAsync(model.Username);
-            if (user == null) return NotFound();
-            user.Email = model.Email;
-            user.FirstName = model.FirstName;
-            user.LastName = model.LastName;
-            user.PhoneNumber = model.PhoneNumber;
-            var result = await _userHelper.UpdateUserAsync(user);
-            if (result.Succeeded)
-                return RedirectToAction("EmployeeList");
-            ModelState.AddModelError("", "Failed to update employee");
-        }
-        return View(model);
-    }
-
-    /// <summary>
-    /// Displays a list of users who are not yet confirmed, accessible only to Admins.
-    /// </summary>
-    /// <returns></returns>
-    [Authorize(Roles = "Admin")]
-    public async Task<IActionResult> ConfirmUsers()
-    {
-        var users = await _userHelper.GetAllUsersAsync();
-        var viewModels = users.Select(u => new UserViewModel
-        {
-            Username = u.UserName,
-            Email = u.Email,
-            FirstName = u.FirstName,
-            LastName = u.LastName,
-            PhoneNumber = u.PhoneNumber
-        }).ToList();
-
-        return View(viewModels);
-    }
-
-    /// <summary>
-    /// Confirms a user based on their ID, accessible only to Admins.
-    /// </summary>
-    /// <param name="id"></param>
-    /// <returns></returns>
-    [Authorize(Roles = "Admin")]
-    public async Task<IActionResult> ConfirmUser(string id)
-    {
-        var user = await _userHelper.GetUserByNameAsync(id);
-        if (user == null) return NotFound();
-        user.EmailConfirmed = true;
-        await _userHelper.UpdateUserAsync(user);
-
-        return RedirectToAction("ConfirmUsers");
-    }
-
-    /// <summary>
-    /// Displays the user management view, accessible only to Admins.
-    /// </summary>
-    /// <returns></returns>
-    [Authorize(Roles = "Admin")]
-    public async Task<IActionResult> ManageUsers()
-    {
-        var users = await _userHelper.GetAllUsersAsync();
-        var viewModels = users.Select(u => new UserViewModel
-        {
-            Username = u.UserName,
-            Email = u.Email,
-            FirstName = u.FirstName,
-            LastName = u.LastName,
-            PhoneNumber = u.PhoneNumber
-        }).ToList();
-
-        return View(viewModels);
-    }
-
-    /// <summary>
-    /// Deletes a user based on their username, accessible only to Admins.
-    /// </summary>
-    /// <param name="username"></param>
-    /// <returns></returns>
-    [Authorize(Roles = "Admin")]
-    public async Task<IActionResult> DeleteUser(string username)
-    {
-        var user = await _userHelper.GetUserByNameAsync(username);
-        if (user == null) return NotFound();
-        var result = await _userHelper.RemoveUserAsync(user);
-        if (!result.Succeeded)
-        {
-            ModelState.AddModelError("", "Failed to delete user");
-        }
-        return RedirectToAction("ManageUsers");
-    }
-
-    /// <summary>
     /// Confirms the user's email and activates the account.
     /// </summary>
     /// <param name="userid">The ID of the user.</param>
@@ -615,6 +422,11 @@ public class AccountController : Controller
     {
         var user = await _userHelper.GetUserByNameAsync(User.Identity.Name);
         if (user == null) return RedirectToAction("Login");
+        if (user.MustChangePassword)
+        {
+            // Force password change before allowing access
+            return RedirectToAction("ChangePassword");
+        }
         var model = new UserViewModel
         {
             Username = user.UserName,
@@ -637,12 +449,17 @@ public class AccountController : Controller
     [Authorize]
     public async Task<IActionResult> UpdateProfile(UserViewModel model)
     {
+        var user = await _userHelper.GetUserByEmailAsync(User.Identity.Name);
+        if (user != null && user.MustChangePassword)
+        {
+            // Force password change before allowing access
+            return RedirectToAction("ChangePassword");
+        }
         if (!ModelState.IsValid)
         {
             TempData["StatusMessage"] = "Invalid data.";
             return RedirectToAction("Profile");
         }
-        var user = await _userHelper.GetUserByEmailAsync(User.Identity.Name);
         if (user == null) return RedirectToAction("Login");
         user.FirstName = model.FirstName;
         user.LastName = model.LastName;
@@ -663,6 +480,11 @@ public class AccountController : Controller
     public async Task<IActionResult> ChangeProfilePicture(IFormFile profilePicture)
     {
         var user = await _userHelper.GetUserByNameAsync(User.Identity.Name);
+        if (user != null && user.MustChangePassword)
+        {
+            // Force password change before allowing access
+            return RedirectToAction("ChangePassword");
+        }
         if (user == null) return RedirectToAction("Login");
         if (profilePicture != null && profilePicture.Length > 0)
         {
@@ -676,5 +498,281 @@ public class AccountController : Controller
             TempData["StatusMessage"] = "No image selected.";
         }
         return RedirectToAction("Profile");
+    }
+
+    /// <summary>
+    /// Displays a list of users in the specified role, accessible only to Admins, with management actions.
+    /// </summary>
+    /// <param name="role">The role to filter users by (e.g., Reader, Employee, Admin).</param>
+    /// <returns></returns>
+    [Authorize(Roles = "Admin")]
+    public async Task<IActionResult> UsersByRole(string role)
+    {
+        if (string.IsNullOrEmpty(role))
+        {
+            return RedirectToAction("ManageUsers");
+        }
+        var allUsers = await _userHelper.GetAllUsersAsync();
+        var usersInRole = new List<UserViewModel>();
+        foreach (var user in allUsers)
+        {
+            if (await _userHelper.IsUserInRoleAsync(user, role))
+            {
+                usersInRole.Add(new UserViewModel
+                {
+                    Username = user.UserName,
+                    Email = user.Email,
+                    FirstName = user.FirstName,
+                    LastName = user.LastName,
+                    PhoneNumber = user.PhoneNumber,
+                    IsAdminConfirmed = user.IsAdminConfirmed // <-- Add this line
+                });
+            }
+        }
+        ViewBag.Role = role;
+        return View(usersInRole);
+    }
+
+    /// <summary>
+    /// Displays users filtered by admin confirmation status (Pending or Confirmed).
+    /// </summary>
+    /// <param name="status">"Pending" for !IsAdminConfirmed, "Confirmed" for IsAdminConfirmed</param>
+    /// <returns></returns>
+    [Authorize(Roles = "Admin")]
+    public async Task<IActionResult> UsersByStatus(string status)
+    {
+        var allUsers = await _userHelper.GetAllUsersAsync();
+        var users = new List<UserViewModel>();
+        if (status == "Pending")
+        {
+            users = allUsers.Where(u => !u.IsAdminConfirmed).Select(user => new UserViewModel
+            {
+                Username = user.UserName,
+                Email = user.Email,
+                FirstName = user.FirstName,
+                LastName = user.LastName,
+                PhoneNumber = user.PhoneNumber,
+                IsAdminConfirmed = user.IsAdminConfirmed
+            }).ToList();
+        }
+        else if (status == "Confirmed")
+        {
+            users = allUsers.Where(u => u.IsAdminConfirmed).Select(user => new UserViewModel
+            {
+                Username = user.UserName,
+                Email = user.Email,
+                FirstName = user.FirstName,
+                LastName = user.LastName,
+                PhoneNumber = user.PhoneNumber,
+                IsAdminConfirmed = user.IsAdminConfirmed
+            }).ToList();
+        }
+        ViewBag.Status = status;
+        return View("UsersByRole", users); // Reuse UsersByRole view
+    }
+
+    /// <summary>
+    /// Displays all users regardless of role or status.
+    /// </summary>
+    /// <returns></returns>
+    [Authorize(Roles = "Admin")]
+    public async Task<IActionResult> AllUsers()
+    {
+        var allUsers = await _userHelper.GetAllUsersAsync();
+        var users = allUsers.Select(user => new UserViewModel
+        {
+            Username = user.UserName,
+            Email = user.Email,
+            FirstName = user.FirstName,
+            LastName = user.LastName,
+            PhoneNumber = user.PhoneNumber,
+            IsAdminConfirmed = user.IsAdminConfirmed
+        }).ToList();
+        ViewBag.Role = "All";
+        return View("UsersByRole", users); // Reuse UsersByRole view
+    }
+
+    /// <summary>
+    /// Displays the user management view, accessible only to Admins.
+    /// </summary>
+    /// <returns></returns>
+    [Authorize(Roles = "Admin")]
+    public IActionResult ManageUsers()
+    {
+        // This view acts as an index for managing users by role
+        return View();
+    }
+
+    /// <summary>
+    /// Displays the view to add a new user to a specified role, accessible only to Admins.
+    /// </summary>
+    /// <param name="role"></param>
+    /// <returns></returns>
+    // GET: Add user to role
+    [Authorize(Roles = "Admin")]
+    public IActionResult AddUserToRole(string role)
+    {
+        ViewBag.Role = role;
+        return View();
+    }
+
+    /// <summary>
+    /// Handles the process of adding a new user to a specified role, accessible only to Admins.
+    /// </summary>
+    /// <param name="model"></param>
+    /// <param name="role"></param>
+    /// <returns></returns>
+    // POST: Add user to role
+    [HttpPost]
+    [Authorize(Roles = "Admin")]
+    public async Task<IActionResult> AddUserToRole(RegisterNewUserViewModel model, string role)
+    {
+        if (ModelState.IsValid)
+        {
+            var user = await _userHelper.GetUserByEmailAsync(model.Email);
+            if (user == null)
+            {
+                user = new User
+                {
+                    Email = model.Email,
+                    UserName = model.Username,
+                    FirstName = model.FirstName,
+                    LastName = model.LastName,
+                    PhoneNumber = model.PhoneNumber,
+                    IsAdminConfirmed = true,
+                    EmailConfirmed = true,
+                    MustChangePassword = true // Require password change on first login
+                };
+                var result = await _userHelper.AddUserAsync(user, model.Password);
+                if (result == IdentityResult.Success)
+                {
+                    await _userHelper.AddUserToRoleAsync(user, role);
+                    return RedirectToAction("UsersByRole", new { role });
+                }
+                ModelState.AddModelError(string.Empty, "The User couldn't be created");
+            }
+            else
+            {
+                ModelState.AddModelError(string.Empty, "User already exists");
+            }
+        }
+        ViewBag.Role = role;
+        return View(model);
+    }
+
+    /// <summary>
+    /// Displays the view to edit a user's details in a specified role, accessible only to Admins.
+    /// </summary>
+    /// <param name="username"></param>
+    /// <param name="role"></param>
+    /// <returns></returns>
+    // GET: Edit user in role
+    [Authorize(Roles = "Admin")]
+    public async Task<IActionResult> EditUserInRole(string username, string role)
+    {
+        var user = await _userHelper.GetUserByNameAsync(username);
+        if (user == null) return NotFound();
+        var model = new UserViewModel
+        {
+            Username = user.UserName,
+            Email = user.Email,
+            FirstName = user.FirstName,
+            LastName = user.LastName,
+            PhoneNumber = user.PhoneNumber
+        };
+        ViewBag.Role = role;
+        return View(model);
+    }
+
+    /// <summary>
+    /// Handles the process of editing a user's details in a specified role, accessible only to Admins.
+    /// </summary>
+    /// <param name="model"></param>
+    /// <param name="role"></param>
+    /// <returns></returns>
+    // POST: Edit user in role
+    [HttpPost]
+    [Authorize(Roles = "Admin")]
+    public async Task<IActionResult> EditUserInRole(UserViewModel model, string role)
+    {
+        if (ModelState.IsValid)
+        {
+            var user = await _userHelper.GetUserByNameAsync(model.Username);
+            if (user == null) return NotFound();
+            user.Email = model.Email;
+            user.FirstName = model.FirstName;
+            user.LastName = model.LastName;
+            user.PhoneNumber = model.PhoneNumber;
+            var result = await _userHelper.UpdateUserAsync(user);
+            if (result.Succeeded)
+                return RedirectToAction("UsersByRole", new { role });
+            ModelState.AddModelError("", "Failed to update user");
+        }
+        ViewBag.Role = role;
+        return View(model);
+    }
+
+    /// <summary>
+    /// Handles the process of removing a user from a specified role, accessible only to Admins.
+    /// </summary>
+    /// <param name="username"></param>
+    /// <param name="role"></param>
+    /// <returns></returns>
+    // POST: Remove user from role
+    [HttpPost]
+    [Authorize(Roles = "Admin")]
+    public async Task<IActionResult> RemoveUserFromRole(string username, string role)
+    {
+        var user = await _userHelper.GetUserByNameAsync(username);
+        if (user == null) return NotFound();
+        var result = await _userHelper.RemoveUserAsync(user);
+        if (!result.Succeeded)
+        {
+            ModelState.AddModelError("", "Failed to remove user");
+        }
+        return RedirectToAction("UsersByRole", new { role });
+    }
+
+    /// <summary>
+    /// Handles the process of confirming a user in a specified role, accessible only to Admins.
+    /// </summary>
+    /// <param name="username"></param>
+    /// <param name="role"></param>
+    /// <returns></returns>
+    // POST: Confirm user in role
+    [HttpPost]
+    [Authorize(Roles = "Admin")]
+    public async Task<IActionResult> ConfirmUserInRole(string username, string role)
+    {
+        var user = await _userHelper.GetUserByNameAsync(username);
+        if (user == null) return NotFound();
+        user.IsAdminConfirmed = true;
+        await _userHelper.UpdateUserAsync(user);
+        return RedirectToAction("UsersByRole", new { role });
+    }
+
+    /// <summary>
+    /// Displays the details of a user in a specified role, accessible only to Admins.
+    /// </summary>
+    /// <param name="username"></param>
+    /// <param name="role"></param>
+    /// <returns></returns>
+    // GET: View user details
+    [Authorize(Roles = "Admin")]
+    public async Task<IActionResult> UserDetails(string username, string role)
+    {
+        var user = await _userHelper.GetUserByNameAsync(username);
+        if (user == null) return NotFound();
+        var model = new UserViewModel
+        {
+            Username = user.UserName,
+            Email = user.Email,
+            FirstName = user.FirstName,
+            LastName = user.LastName,
+            PhoneNumber = user.PhoneNumber
+        };
+        ViewBag.Role = role;
+        ViewBag.ProfileImageUrl = string.IsNullOrEmpty(user.ImageUrl) ? "/images/noimage.png" : user.ImageUrl;
+        return View(model);
     }
 }

@@ -1,11 +1,9 @@
 @model SuperLibrary.Web.Models.UserViewModel
-@using SuperLibrary.Web.Models
 @{
-    ViewData["Title"] = "My Profile";
-    var statusMessage = ViewBag.StatusMessage as string;
+    ViewData["Title"] = $"{Model.Username} Profile";
 }
 
-<h1>My Profile</h1>
+<h1>@Model.Username Profile</h1>
 
 <div>
     <hr />
@@ -26,19 +24,13 @@
         </div>
         <div class="col-md-4">
             <img src="@ViewBag.ProfileImageUrl" alt="Profile Picture" style="width:300px;height:300px;max-width:100%;height:auto;border-radius:10px;object-fit:cover;" />
-            <form asp-action="ChangeProfilePicture" method="post" enctype="multipart/form-data" class="mt-2">
-                <input type="file" name="profilePicture" accept="image/*" class="form-control mb-2" />
-                <button type="submit" class="btn btn-sm btn-primary">Change Picture</button>
-            </form>
         </div>
     </div>
 </div>
 <div class="mt-3">
-    <a asp-action="ChangeUser" class="btn btn-outline-warning">Edit Profile</a>
-    <a asp-action="ChangePassword" class="btn btn-outline-info">Change Password</a>
-    <a asp-action="Index" asp-controller="Home" class="btn btn-outline-secondary">Back</a>
+    @if (User.IsInRole("Admin"))
+    {
+        <a asp-action="EditUserInRole" asp-controller="Account" asp-route-username="@Model.Username" asp-route-role="@ViewBag.Role" class="btn btn-outline-warning"> Edit</a>
+    }
+    <a asp-action="UsersByRole" asp-controller="Account" asp-route-role="@ViewBag.Role" class="btn btn-outline-secondary"> Return</a>
 </div>
-@if (!string.IsNullOrEmpty(statusMessage))
-{
-    <div class="alert alert-info mt-3">@statusMessage</div>
-}

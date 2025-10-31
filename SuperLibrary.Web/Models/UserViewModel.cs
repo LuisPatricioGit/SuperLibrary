@@ -25,4 +25,7 @@ public class UserViewModel
     [DataType(DataType.PhoneNumber)]
     [Display(Name = "Phone Number")]
     public string PhoneNumber { get; set; }
+
+    // Indicates if the user is confirmed by an admin
+    public bool IsAdminConfirmed { get; set; }
 }

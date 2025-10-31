@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using SuperLibrary.Web.Data;
 
@@ -11,9 +12,11 @@ using SuperLibrary.Web.Data;
 namespace SuperLibrary.Web.Migrations
 {
     [DbContext(typeof(DataContext))]
-    partial class DataContextModelSnapshot : ModelSnapshot
+    [Migration("20251031135537_AdminConfirm")]
+    partial class AdminConfirm
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -203,7 +206,7 @@ namespace SuperLibrary.Web.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Books", (string)null);
+                    b.ToTable("Books");
                 });
 
             modelBuilder.Entity("SuperLibrary.Web.Data.Entities.Loan", b =>
@@ -234,7 +237,7 @@ namespace SuperLibrary.Web.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Loans", (string)null);
+                    b.ToTable("Loans");
                 });
 
             modelBuilder.Entity("SuperLibrary.Web.Data.Entities.LoanDetail", b =>
@@ -272,7 +275,7 @@ namespace SuperLibrary.Web.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("LoanDetails", (string)null);
+                    b.ToTable("LoanDetails");
                 });
 
             modelBuilder.Entity("SuperLibrary.Web.Data.Entities.LoanDetailTemp", b =>
@@ -302,7 +305,7 @@ namespace SuperLibrary.Web.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("LoanDetailsTemp", (string)null);
+                    b.ToTable("LoanDetailsTemp");
                 });
 
             modelBuilder.Entity("SuperLibrary.Web.Data.Entities.User", b =>

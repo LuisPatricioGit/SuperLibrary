@@ -1,30 +1,26 @@
-﻿@model List<SuperLibrary.Web.Models.UserViewModel>
+@{
+    ViewData["Title"] = "Manage Users";
+}
 
-<h2>Manage Users</h2>
-<table class="table">
-    <thead>
-        <tr>
-            <th>Username</th>
-            <th>Email</th>
-            <th>Name</th>
-            <th>Phone</th>
-            <th>Actions</th>
-        </tr>
-    </thead>
-    <tbody>
-    @foreach (var user in Model)
-    {
-        <tr>
-            <td>@user.Username</td>
-            <td>@user.Email</td>
-            <td>@user.FirstName @user.LastName</td>
-            <td>@user.PhoneNumber</td>
-            <td>
-                <a asp-action="EditEmployee" asp-route-id="@user.Username" class="btn btn-sm btn-primary">Edit</a>
-                <a asp-action="DeleteUser" asp-route-username="@user.Username" class="btn btn-sm btn-danger" onclick="return confirm('Are you sure?');">Delete</a>
-                <a asp-action="ConfirmUser" asp-route-id="@user.Username" class="btn btn-sm btn-success">Confirm</a>
-            </td>
-        </tr>
-    }
-    </tbody>
-</table>
+<div class="container" style="height: 60vh;">
+    <h2>Manage User</h2>
+    <div class="row h-100 align-items-center">
+        <!-- Select a Role Section -->
+        <div class="col-md-6 d-flex flex-column align-items-center">
+            <h3>By Role:</h3>
+            <div class="btn-group-vertical" style="width: 300px;">
+                <a asp-controller="Account" asp-action="UsersByRole" asp-route-role="Reader" class="btn btn-lg btn-primary mb-4" style="height: 80px; font-size: 2rem;"> Reader</a>
+                <a asp-controller="Account" asp-action="UsersByRole" asp-route-role="Employee" class="btn btn-lg btn-success mb-4" style="height: 80px; font-size: 2rem;"> Employee</a>
+                <a asp-controller="Account" asp-action="UsersByRole" asp-route-role="Admin" class="btn btn-lg btn-danger" style="height: 80px; font-size: 2rem;"> Admin</a>
+            </div>
+        </div>
+        <!-- Select by Status Section -->
+        <div class="col-md-6 d-flex flex-column align-items-center">
+            <h3>By Status:</h3>
+            <div class="btn-group-vertical" style="width: 300px;">
+                <a asp-controller="Account" asp-action="UsersByStatus" asp-route-status="Pending" class="btn btn-lg btn-warning mb-4" style="height: 80px; font-size: 2rem;"> Not Confirmed</a>
+                <a asp-controller="Account" asp-action="AllUsers" class="btn btn-lg btn-dark" style="height: 80px; font-size: 2rem;"> All Users</a>
+            </div>
+        </div>
+    </div>
+</div>

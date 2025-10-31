@@ -79,6 +79,7 @@ public class SeedDb
                 PhoneNumber = phoneNumber,
                 EmailConfirmed = true,
                 MustChangePassword = false,
+                IsAdminConfirmed = true
             };
 
             var result = await _userHelper.AddUserAsync(user, "Obv!ouslyF@k3");

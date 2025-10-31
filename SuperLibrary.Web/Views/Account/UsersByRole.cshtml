@@ -1,0 +1,74 @@
+@model IEnumerable<SuperLibrary.Web.Models.UserViewModel>
+@{
+    ViewData["Title"] = $"Manage Users";
+}
+
+<h1>Manage Users</h1>
+
+<a asp-action="ManageUsers" asp-controller="Account" class="btn btn-secondary mb-3"> Return</a>
+
+@if (User.IsInRole("Admin"))
+{
+    <a asp-action="AddUserToRole" asp-controller="Account" asp-route-role="@ViewBag.Role" class="btn btn-success mb-3 ms-2">Add User</a>
+}
+
+@if (!Model.Any())
+{
+    <div class="alert alert-info">No users found in this role.</div>
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Username</th>
+                <th>Email</th>
+                <th>First Name</th>
+                <th>Last Name</th>
+                <th>Phone Number</th>
+                @if (User.IsInRole("Admin"))
+                {
+                    <th>Actions</th>
+                }
+            </tr>
+        </thead>
+        <tbody>
+        @foreach (var user in Model)
+        {
+            <tr>
+                <td>@user.Username</td>
+                <td>@user.Email</td>
+                <td>@user.FirstName</td>
+                <td>@user.LastName</td>
+                <td>@user.PhoneNumber</td>
+                @if (User.IsInRole("Admin"))
+                {
+                    <td>
+                        <a asp-action="UserDetails" asp-controller="Account" asp-route-username="@user.Username" asp-route-role="@ViewBag.Role" class="btn btn-info btn-sm">View</a>
+                        <a asp-action="EditUserInRole" asp-controller="Account" asp-route-username="@user.Username" asp-route-role="@ViewBag.Role" class="btn btn-primary btn-sm">Edit</a>
+                        <form asp-action="RemoveUserFromRole" asp-controller="Account" method="post" style="display:inline">
+                            <input type="hidden" name="username" value="@user.Username" />
+                            <input type="hidden" name="role" value="@ViewBag.Role" />
+                            <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure you want to remove this user?');">Remove</button>
+                        </form>
+                        @if (user.IsAdminConfirmed)
+                        {
+                            <span class="text-success">
+                                <i class="bi bi-check-circle-fill"></i> Confirmed
+                            </span>
+                        }
+                        else
+                        {
+                            <form asp-action="ConfirmUserInRole" asp-controller="Account" method="post" style="display:inline">
+                                <input type="hidden" name="username" value="@user.Username" />
+                                <input type="hidden" name="role" value="@ViewBag.Role" />
+                                <button type="submit" class="btn btn-success btn-sm">Confirm</button>
+                            </form>
+                        }
+                    </td>
+                }
+            </tr>
+        }
+        </tbody>
+    </table>
+}

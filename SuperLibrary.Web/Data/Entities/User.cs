@@ -30,4 +30,7 @@ public class User : IdentityUser
     // $"https://localhost:44353/images/noimage.png" // Local version
 
     public bool MustChangePassword { get; set; }
+
+    // Indicates if the user has been confirmed by an admin
+    public bool IsAdminConfirmed { get; set; } = false;
 }
